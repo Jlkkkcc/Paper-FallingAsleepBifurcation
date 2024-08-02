@@ -1,4 +1,4 @@
-%% Granger-Causality test final results
+%% Granger-Causality test final results (Figure 3G)
 
 % See analysis in the process codes
 

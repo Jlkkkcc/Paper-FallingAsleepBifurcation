@@ -1,4 +1,4 @@
-%% Bifurcation diagram - Sleep distance s(t) versus the feature dynamics
+%% Bifurcation diagram - Sleep distance s(t) versus the feature dynamics (Figures 3C and 3F)
 
 % Author: JL
 

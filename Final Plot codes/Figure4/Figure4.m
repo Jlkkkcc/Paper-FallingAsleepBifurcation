@@ -2,16 +2,163 @@
 
 % Author: JL
 
-%
+%% Figure 4B
+
+clear all
+clc
+load Figure4B.mat
+
+figure
+hold on
+plot(tvec,nis_smooth,'LineWidth',2,'Color','r')
+plot(tvec,raws,'LineWidth',2,'Color','k')
+legend({'pred','raw'})
+xlabel('Time (min)')
+ylabel('Sleep distance')
+box off
+set(gca, 'FontSize', 12);
+    set(gca, 'TickDir', 'out');
+    set(gca, 'ticklength', 2*get(gca, 'ticklength'));
+    set(gca, 'lineWidth', 2);
 
 
+%% Figure 4C
+
+clear all
+clc
+load Figure4C.mat
+
+colorsall = distinguishable_colors(10);
+colorsall = colorsall([2,1,4,5,6,9,8],:);
+
+figure
+violinplot(cos_avg,nights_used,'ViolinColor',colorsall)
+box off
+xlabel('No. of training nights')
+ylabel('Cosine similarity')
+set(gca, 'FontSize', 12);
+set(gca, 'TickDir', 'out');
+set(gca,'ticklength',2*get(gca,'ticklength'))
+set(gca,'lineWidth',2)
+
+%% Figure 4D (i-ii) Representative training night
+
+% Figure 4D shows an representative one from the entire prediction result
+% This part takes relatively long to run for computation of the bifurcation
+% diagram;
+
+clear all
+clc
+load Figure4D1.mat
+
+[SCrtic, ~]  = plot_bifurcation_rev(dd, xx_smooth, tvec, 'Noname', params_optim, 1);
+
+%% Figure 4D (iii), Representative testing night for prediction
+
+% This plot only shows one out of 7 testing night of that participant
+% For a more comprehensive view of all testing nights example, see the
+% "Core Algorithms and Examples" folder.
+
+% In the main figure, the hypnogram was removed, but retained here for a
+% more direct visualisation of the golden standard
+
+clear all
+clc
+load Figure4D2.mat
+
+stageNames = {'Awake', 'N1', 'N2', 'N3'};
+f = figure;
+f.Position(3:4) = [500,600];
+
+tonset = find(tvec==0);
+
+ax1=subplot(3,1,3);
+plot(tvec,hyp_expand,'LineWidth',2)
+ylim([0,3])
+box off
+set(gca,'FontSize', 12)
+set(gca,'TickDir','out')
+set(gca,'ticklength',2*get(gca,'ticklength'))
+set(gca,'lineWidth',2)
+set(gca, 'YTick', 0:3, 'YTickLabel', stageNames);
+line([0,0],ax1.YLim,'LineStyle','--','LineWidth',2,'Color','r');
+hold on
+crossingTimePoints = crossthisn.downwardCrossingTime;
+crossingDetails = crossthisn;
+if ~isempty(crossingTimePoints)
+    for i = 1:length(crossingDetails)
+        if crossingDetails(i).isRealCrossing
+
+            tidx_cross = find(tvec>crossingDetails(i).downwardCrossingTime,1);
+            h3 = plot(crossingDetails(i).downwardCrossingTime, hyp_expand(tidx_cross-1), 'ro', 'MarkerSize', 8, 'MarkerFaceColor', 'r'); % Plot real crossing points
+            % else
+            %     h3 = plot(crossingDetails(i).downwardCrossingTime, criticalSValue, 'bo', 'MarkerSize', 8, 'MarkerFaceColor', 'b'); % Plot other crossing points
+        end
+    end
+end
+
+xlabel('Time (min)')
+ax2=subplot(3,1,1:2);
+plot(tvec,xx_smoothed,'k')
+hold on
+yline(criticalSValue, 'g--', 'LineWidth', 1.5)
+box off
+set(gca,'FontSize', 12)
+set(gca,'TickDir','out')
+set(gca,'ticklength',2*get(gca,'ticklength'))
+set(gca,'lineWidth',2)
+ylabel('Sleep Distance')
+% line([0,0],ax2.YLim,'LineStyle','--','LineWidth',2,'Color','r');
+
+crossingTimePoints = crossthisn.downwardCrossingTime;
+crossingDetails = crossthisn;
+if ~isempty(crossingTimePoints)
+    for i = 1:length(crossingDetails)
+        if crossingDetails(i).isRealCrossing
+            h3 = plot(crossingDetails(i).downwardCrossingTime, criticalSValue, 'ro', 'MarkerSize', 8, 'MarkerFaceColor', 'r'); % Plot real crossing points
+            % else
+            %     h3 = plot(crossingDetails(i).downwardCrossingTime, criticalSValue, 'bo', 'MarkerSize', 8, 'MarkerFaceColor', 'b'); % Plot other crossing points
+        end
+    end
+end
+line([0,0],ax2.YLim,'LineStyle','--','LineWidth',2,'Color','r');
 
 
+tcrnow = mdltcrt(night_to_plot);
+line([tcrnow,tcrnow],ax2.YLim,'LineStyle','--','LineWidth',2,'Color','b');
 
+%% Figure 4E
 
+clear all
+clc
+load Figure4E.mat
 
+figure
+binedges = [-20:0.5:0];
+% histogram(predany_all(idxmask),binedges,'Normalization','probability')
+% hold on
+histogram(tcrtc_alltrains_vec(idxposmdl),binedges,'Normalization','probability')
+xlabel('Time (min)')
+ylabel('Probability')
+box off
+set(gca,'FontSize', 12)
+set(gca,'TickDir','out')
+set(gca,'ticklength',2*get(gca,'ticklength'))
+set(gca,'lineWidth',2)
 
-
+tdiff = predany_all(idxallinc) - tcrtc_alltrains_vec(idxallinc);
+figure
+bed = [-15:0.5:15];
+histogram(tdiff,bed,'Normalization','probability')
+xlabel('Prediction Error (min)')
+ylabel('Probability')
+box off
+set(gca,'FontSize', 12)
+set(gca,'TickDir','out')
+set(gca,'ticklength',2*get(gca,'ticklength'))
+set(gca,'lineWidth',2)
+tdmed = median(tdiff,'omitnan');
+line([tdmed,tdmed],ylim,'LineStyle','--','LineWidth',2,'Color','r');
 
 
 
