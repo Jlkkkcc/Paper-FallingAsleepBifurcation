@@ -1,0 +1,1630 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Author: Anastasia Ilina
+
+% Predicting the S-variable for the unseen nights based on a number of
+% selected stud
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% Fixing directories
+
+% Add necessary directories
+addpath('/home/anastasia/Dropbox/ISN work/Work on new dataset/Mean S-variable for prediction/Functions')
+addpath('/home/anastasia/Dropbox/ISN work/Work on new dataset')
+addpath('/mnt/LongTermStorage/Airforce_Surrey_psa/af0165')
+addpath ('/home/anastasia/Dropbox/ISN work/Whole Code Pipelines/My code/edf-viewer-master')
+addpath('/mnt/LongTermStorage/Airforce_Surrey_psa/HYPNOGRAMS')
+addpath('/mnt/LongTermStorage/anastasia/Airforce_analysed')
+addpath('/home/anastasia/Dropbox/Model fitting')
+
+% change directory to the folder with the hypnograms
+cd('/mnt/LongTermStorage/Airforce_Surrey_psa')
+
+%% Get a list of all of the participants in the directory
+
+% Get a list of all files and folders in the current directory
+files = dir;
+
+% Filter out all the files (keep only folders)
+folders = files([files.isdir]);
+
+% Remove the '.' and '..' directories
+folders = folders(~ismember({folders.name}, {'.', '..', 'HYPNOGRAMS'}));
+
+% Extract the folder names
+participantNames = {folders.name};
+
+
+random_seeds =[1, 14, 42, 60, 78];
+
+
+%load '/Users/anastasia/Dropbox/ISN work/Work on new dataset/Mean S-variable for prediction/participantSubset.mat'
+addpath '/home/anastasia/Dropbox/ISN work/Work on new dataset/Mean S-variable for prediction/Functions'
+
+%num2select = 4;
+num_nights = 8;
+
+% Turn off the warnings to declutter the command line
+warning('off', 'all')
+
+prev_num_nights = 0;
+% Get the participant ID
+%participantName = participantSubset.Patient_ID{1};
+
+% Define the constants for the script
+epc_len = 6; % epoch length in seconds
+overlap = 3; % overlap in seconds
+maxTimePreSleep = 30; % maximal pre-sleep time in minutes
+maxTimePostSleep = 10; % maximal post-sleep time in minutes
+SelectedChannels = {'F4_A1', 'C4_A1', 'P4_A1', 'O2_A1',  'F3_A2', 'C3_A2', 'P3_A2', 'O1_A2'};
+
+smoothingMethod = 'retrospective_median';
+smoothingWindow = 20;
+smoothingOrder = 4;
+
+numFts = 47;
+step_size_sec = epc_len - overlap;
+
+numEpochsPreSleep = (maxTimePreSleep*60)/step_size_sec -1;
+numEpochsPostSleep = 209; %(maxTimePostSleep * 60)/step_size_sec - 1;
+
+%tvec = linspace(-maxTimePreSleep, maxTimePostSleep, numEpochsPostSleep + numEpochsPreSleep);
+% Define the directories to save the resultant plots and variables
+%
+
+saveDir = '/home/anastasia/Dropbox/ISN work/Work on new dataset/Critical Point Prediction Corrected/';
+
+% saveDirSVariables = ['/Users/anastasia/Dropbox/ISN work/Work on new dataset/Critical Point Prediction/',participantName,  '/Mean S Variable Reference/'];
+% savePredDirSVariables = ['/Users/anastasia/Dropbox/ISN work/Work on new dataset/Critical Point Prediction/', participantName, '/Predited S Variable/'];
+% savePredDirBifurcation = ['/Users/anastasia/Dropbox/ISN work/Work on new dataset/Critical Point Prediction/', participantName, '/FittedBifurcation/'];
+% saveDirParticipant = ['/Users/anastasia/Dropbox/ISN work/Work on new dataset/Critical Point Prediction/',participantName];
+% saveDir = '/Users/anastasia/Dropbox/ISN work/Work on new dataset/Critical Point Prediction/';
+
+% Construct path to the Results Table
+filePath = fullfile('/home/anastasia/Dropbox/ISN work/Work on new dataset/Critical Point Prediction Corrected/SummaryTable.mat');
+Updated_filePath = fullfile('/home/anastasia/Dropbox/ISN work/Work on new dataset/Critical Point Prediction Corrected/UpdatedSummaryTable.mat');
+%filePath = fullfile('/Users/anastasia/Dropbox/ISN work/Work on new dataset/Critical Point Prediction/SummaryTable.mat');
+FixedfilePath = fullfile('/home/anastasia/Dropbox/ISN work/Work on new dataset/Critical Point Prediction Corrected/WithTestNightsNumbersSummaryTable.mat');
+
+if exist(filePath, 'file')
+    % Load the table from the file
+    loadedData = load(Updated_filePath);
+    predictionSummaryTable = loadedData.predictionSummaryTable;
+    newColumnData = cell(height(predictionSummaryTable), 1); % Example data, replace with actual data
+
+    newColumnName = 'TestingNights'; % Name of the new column
+    predictionSummaryTable.(newColumnName) = newColumnData;
+    predictionSummaryTable = sortrows(predictionSummaryTable, 'Patient_ID');
+else
+
+    predictionSummaryTable = table('Size', [0, 27], ...
+        'VariableTypes', {'string', 'double', 'double', 'cell', 'cell', 'cell', 'cell', 'double', 'double', 'double', 'cell', 'cell',  'cell', 'cell', 'cell', 'cell', 'cell', 'cell', 'cell', 'cell', 'double', 'double', 'cell', 'cell', 'cell', 'cell', 'cell'}, ...
+        'VariableNames', {'Patient_ID', 'Max_Number_Nights_Available', 'Number_of_Nights_Used', 'Nights_for_Modelling', 'Global_Median_Sleep_Onset', 'Mean_Fts', 'STD_Fts', 'ifSuccessfullyFitted', 'R_squared', 'Min_RMSE', 'Initial_x', 'Optimal_Params', 'Fitted_Bifurcation_Model', 'Smoothed_Fitted_Bifurcation_Model', 'Mean_S_Variable', ...
+        'Control_Parameter', 'Global_Minimum', 'Mean_Hypnogram', 'SVariableCriticalZone', 'C_3_Solutions', 'AverageCosineSimilarity', 'AverageDTWDistance',...
+        'Cosine_Similarity_Array_S_Variable', 'DTW_S_Array_Variable', 'Estimated_S_variables', 'Estimated_Smoothed_S_variables','Night_Hypnograms'});
+
+    % Optionally, save the  new table to the file
+    save(filePath, 'predictionSummaryTable');
+
+end
+
+if restart == 1
+    averageCosineSimilarityScoresAll = [];
+    cosineSimilarityAll = [];
+    num_night_vec_all = [];
+    all_nums = [];
+    average_cosine_scores_mat = NaN(length(participantNames), num_nights);
+    excluded_participants = {};
+else
+    %excluded_participants = {participantNames{8}, participantNames{5}};
+    load(fullfile([saveDir, 'averageCosineSimilarityScoresAll.mat']));
+    load(fullfile([saveDir, 'cosineSimilarityAll.mat']));
+    load(fullfile([saveDir, 'num_night_vec_all.mat']));
+    load(fullfile([saveDir, 'all_nums.mat']));
+    load(fullfile([saveDir, 'average_cosine_scores_mat.mat']));
+    load(fullfile([saveDir, 'excluded_participants.mat']));
+
+end
+
+part_idx = 0;
+num_prev_part_nights = 0;
+for part = 1: length(participantNames)
+    part_idx = part_idx + 1;
+
+    participantName = participantNames{part};
+
+    if  part == 5
+        part_idx = part_idx - 1;
+        excluded_participants = [excluded_participants, participantName];
+        continue
+    end
+
+
+    saveDirSVariables = ['/home/anastasia/Dropbox/ISN work/Work on new dataset/Critical Point Prediction Corrected/', participantName, '/Mean S Variable/'];
+    savePredDirSVariables = ['/home/anastasia/Dropbox/ISN work/Work on new dataset/Critical Point Prediction Corrected/', participantName, '/Predicted S Variable/'];
+    savePredDirBifurcation = ['/home/anastasia/Dropbox/ISN work/Work on new dataset/Critical Point Prediction Corrected/', participantName, '/FittedBifurcation/'];
+    saveDirParticipant = ['/home/anastasia/Dropbox/ISN work/Work on new dataset/Critical Point Prediction Corrected/',participantName];
+
+    % Construct the path to the .mat file
+    savePathParticipantSubset = fullfile('/mnt/LongTermStorage/anastasia/Airforce_analysed/Participants_Epoched_EEG/', ['ArtifactFtEEGFallingAsleep_', participantName, '.mat']);
+
+    % Check if the file exists before loading
+    if exist(savePathParticipantSubset, 'file')
+        % Load the table
+        loadedData = load(savePathParticipantSubset);
+
+        % Access the table (assuming 'participantSubset' is the variable name inside the MAT-file)
+        participantSubset = loadedData.participantSubset;
+
+        % Now you can use 'participantSubset' as needed
+    else
+        disp(['File not found: ', savePathParticipantSubset]);
+    end
+
+    % Identifiy which nights are not empty and have acceptable sleep
+    % quality after sleep onsest
+    nights = 1:8;
+    non_empty_mask = ones(num_nights,1);
+
+    for n_n = 1:num_nights
+
+        allNightHypnogram = participantSubset.CleanSleepStagesInt{n_n};
+        sleepOnsetIndex = participantSubset.SleepOnsetIndex(n_n);
+
+        if isempty(participantSubset.CleanSleepStagesInt{n_n}) || (participantSubset.SleepOnsetIndex(n_n) + 10*2-1) > length(allNightHypnogram)
+            non_empty_mask(n_n) = 0;
+            continue
+        end
+
+
+        postSleepPeriod = allNightHypnogram(sleepOnsetIndex:sleepOnsetIndex + 10*2-1);
+        preSleepPeriod = allNightHypnogram(1:sleepOnsetIndex -1);
+        averagePostSleepDepth = mean(postSleepPeriod);
+        numAwakeEpochs = sum(postSleepPeriod == 0);
+        REMbeforeSO = sum(preSleepPeriod == 5);
+
+
+        if averagePostSleepDepth < 1.5 || numAwakeEpochs > 1 || isempty(participantSubset.FallingAsleepFeatures{n_n}) || REMbeforeSO > 0
+            non_empty_mask(n_n) = 0;
+        end
+    end
+
+
+    averageCosineSimilarityScoresParticipant  = NaN(5, 8);
+    allCosineSimilarityScoresParticipant = [];
+    all_scores_nigths_vec = [];
+
+
+    previous_selected_nights = cell(1, 8);
+    for cellidx = 1:8
+        previous_selected_nights{cellidx} = {};
+    end
+
+    non_empty_nights = nights(logical(non_empty_mask(1:8)));
+
+    if sum(non_empty_mask) < 5
+        part_idx = part_idx - 1;
+        excluded_participants = [excluded_participants, participantName];
+        continue
+    end
+
+
+    rng(105)
+    first_nights = randsample(non_empty_nights, 5);
+
+
+    for seed_idx = 1:5
+        seed = random_seeds(seed_idx);
+
+        saveDirSVariables_set = [saveDirSVariables, 'RandomSeedSet_', num2str(seed), '/'];
+        savePredDirSVariables_set = [savePredDirSVariables,  'RandomSeedSet_', num2str(seed), '/'];
+        savePredDirBifurcation_set = [savePredDirBifurcation,  'RandomSeedSet_', num2str(seed), '/'];
+
+
+        % Use different number of nights used to create the
+        % predictive model for a participant
+
+        for num2select = 1:min(sum(non_empty_mask), 7)
+            
+            training_nights_idx = num2select+(seed_idx-1)*min(sum(non_empty_mask),7) +num_prev_part_nights;
+            training_nights = [];
+            if height(predictionSummaryTable) >= training_nights_idx
+                training_nights = predictionSummaryTable.Nights_for_Modelling{training_nights_idx};
+                non_empty_nights = nights(logical(non_empty_mask(1:8)));
+                rest_of_indices = [];
+                for n_n = 1: length(non_empty_nights)
+                    if ~ismember(non_empty_nights(n_n), training_nights)
+                        rest_of_indices = [rest_of_indices, non_empty_nights(n_n)];
+                    end
+                end
+            end
+
+
+
+
+            if  ~isempty(predictionSummaryTable(and(strcmp(predictionSummaryTable.Patient_ID, participantName),predictionSummaryTable.Number_of_Nights_Used == num2select),:))
+
+                % Find indices that match the Patient_ID and Number_of_Nights_Used
+                patientIDMatch = strcmp(predictionSummaryTable.Patient_ID, participantName);
+                numNightsMatch = predictionSummaryTable.Number_of_Nights_Used == num2select;
+
+                % Initialize an array to store matches for the cell array comparison
+                nightsForModellingMatch = false(height(predictionSummaryTable), 1);
+
+                % Compare each cell in Nights_for_Modelling with rand_night_indices
+                for i = 1:height(predictionSummaryTable)
+                    if isequal(predictionSummaryTable.Nights_for_Modelling{i}, training_nights)
+                        nightsForModellingMatch(i) = true;
+                    end
+                end
+
+                % Find the index of the row that matches all conditions
+                rowIdx = find(patientIDMatch & numNightsMatch & nightsForModellingMatch);
+
+                predictionSummaryTable.TestingNights{rowIdx} = rest_of_indices;
+                continue
+
+
+            else
+
+                saveDirSVariables_night = [saveDirSVariables_set, num2str(num2select), '_Nights_Selected/'];
+                savePredDirSVariables_night = [savePredDirSVariables_set, num2str(num2select), '_Nights_Selected/'];
+                savePredDirBifurcation_night = [savePredDirBifurcation_set, num2str(num2select), '_Nights_Selected/'];
+
+                if ~exist(saveDirSVariables_night, 'dir')
+                    mkdir(saveDirSVariables_night);
+                end
+                if ~exist(savePredDirSVariables_night, 'dir')
+                    mkdir(savePredDirSVariables_night);
+                end
+
+                if ~exist(savePredDirBifurcation_night, 'dir')
+                    mkdir(savePredDirBifurcation_night);
+                end
+
+
+                % Create a row for storing the results of this modelling iteration
+                predictionSummaryTableRow = table('Size', [1, 27], ...
+                    'VariableTypes', {'string', 'double', 'double', 'cell', 'cell', 'cell', 'cell', 'double', 'double', 'double', 'cell', 'cell',  'cell', 'cell', 'cell', 'cell', 'cell', 'cell', 'cell', 'cell', 'double', 'double', 'cell', 'cell', 'cell', 'cell', 'cell'}, ...
+                    'VariableNames', {'Patient_ID', 'Max_Number_Nights_Available', 'Number_of_Nights_Used', 'Nights_for_Modelling', 'Global_Median_Sleep_Onset', 'Mean_Fts', 'STD_Fts', 'ifSuccessfullyFitted', 'R_squared', 'Min_RMSE', 'Initial_x', 'Optimal_Params', 'Fitted_Bifurcation_Model', 'Smoothed_Fitted_Bifurcation_Model', 'Mean_S_Variable', ...
+                    'Control_Parameter', 'Global_Minimum', 'Mean_Hypnogram', 'SVariableCriticalZone', 'C_3_Solutions', 'AverageCosineSimilarity', 'AverageDTWDistance',...
+                    'Cosine_Similarity_Array_S_Variable', 'DTW_S_Array_Variable', 'Estimated_S_variables', 'Estimated_Smoothed_S_variables','Night_Hypnograms'});
+
+                % Pick the random nights from using the number of nights selected
+                num_nights_available = length(non_empty_nights);
+                non_empty_nights = nights(logical(non_empty_mask(1:8)));
+               
+                rng(seed) % Fix the random seed for replicability
+
+               
+                if num2select == 1
+                    rand_night_indices = first_nights(seed_idx);
+                else
+
+                    rand_night_indices = [first_nights(seed_idx), randsample(setdiff(non_empty_nights, first_nights(seed_idx)), num2select - 1)];
+                end
+                
+
+                % Log it into the table
+                predictionSummaryTableRow.Patient_ID = participantName;
+                predictionSummaryTableRow.Number_of_Nights_Used = num2select;
+                predictionSummaryTableRow.Nights_for_Modelling = rand_night_indices;
+                predictionSummaryTableRow.Max_Number_Nights_Available = num_nights_available;
+
+                % Initialize an empty string
+                nightsStr = '';
+
+                % Loop through each element in the array
+                for i = 1:length(rand_night_indices)
+                    if i == length(rand_night_indices)
+                        % Do not add a comma after the last element
+                        nightsStr = [nightsStr sprintf('%d', rand_night_indices(i))];
+                    else
+                        % Add a comma after each element except the last
+                        nightsStr = [nightsStr sprintf('%d, ', rand_night_indices(i))];
+                    end
+                end
+
+                disp(['Nights selected: ', nightsStr])
+
+
+                % Initialise empty arrays for storage
+                %postSleepFeatureMatrix = NaN(num2select, numEpochsPostSleep, numFts);
+                preSleepFeatureMatrix = NaN(num2select,numEpochsPreSleep, numFts);
+
+                FtsAcrossNights = [];
+                avgFtsStorage = {};
+                postSleepFeatureMatrix = [];
+
+                meanFtsSelectedNights = NaN(1, numFts);
+                stdFtsSelectedNights = NaN(1, numFts);
+
+                HypnogramMatrix = NaN(num2select,80);
+                maxTime2Sleep = 0;
+                % Iterate through each of the nights in the selected subset of nights
+                for i = 1:length(rand_night_indices)
+
+                    curIdx = rand_night_indices(i);
+
+                    if i == 1
+                        tvec = participantSubset.timeToSleepOnsetMinutes{curIdx};
+                    end
+
+                    % Make sure we define the time grid for plotting consistently
+                    if participantSubset.Time2Sleep(curIdx) > 30
+                        tvec = participantSubset.timeToSleepOnsetMinutes{curIdx};
+                        tvec = tvec(participantSubset.sleepOnsetIdx(curIdx)-30*20 + 1:end);
+                    elseif length(participantSubset.timeToSleepOnsetMinutes{curIdx}) > length(tvec)
+                        tvec = participantSubset.timeToSleepOnsetMinutes{curIdx};
+
+                    end
+                    if participantSubset.Time2Sleep(curIdx) > maxTime2Sleep
+                        maxTime2Sleep = participantSubset.Time2Sleep(curIdx);
+                    end
+                    % Retrieve the timepoint of current sleep onset
+                    curSleepOnset = participantSubset.sleepOnsetIdx(curIdx);
+
+                    % Initialize a matrix to store the features for averaging
+                    featureMatrixFallingAsleep = NaN(height(participantSubset.FallingAsleepFeatures{curIdx}), numFts, length(SelectedChannels));
+
+                    % Loop through the specified EEG channels and accumulate the features
+                    for ch = 1:length(SelectedChannels)
+
+                        channelDataFallingAsleep = participantSubset.FallingAsleepFeatures{curIdx}.(SelectedChannels{ch});
+
+                        for f = 1:numFts
+                            % Extract the feature values for the current channel
+                            featureMatrixFallingAsleep(:, f, ch) = cellfun(@(x) x(f), channelDataFallingAsleep);
+                        end
+
+                    end
+
+                    % Calculate the average features across channels for each timepoint
+                    averageFeaturesFallingAsleep = mean(featureMatrixFallingAsleep, 3, 'omitmissing');
+
+                    avgFtsStorage{i} = averageFeaturesFallingAsleep;
+
+                    % Concatenate the average features for each night
+                    FtsAcrossNights = [FtsAcrossNights; averageFeaturesFallingAsleep];
+                 
+                end
+
+                % Calculate the mean and std of feature values across all timepoints and
+                % all selected nights for further normalisation
+                meanFtsSelectedNights = mean(FtsAcrossNights, 'omitmissing');
+                stdFtsSelectedNights = std(FtsAcrossNights, 'omitmissing');
+
+                % Store them in the table
+                predictionSummaryTableRow.Mean_Fts = meanFtsSelectedNights;
+                predictionSummaryTableRow.STD_Fts = stdFtsSelectedNights;
+
+                % Initialise empty arrays for averaging
+                meanSVariable = NaN(numEpochsPostSleep+numEpochsPreSleep);
+                SVariablesCell = {};
+                normalisedFtTrajs = {};
+                SVariableMatrix = NaN(num2select, numEpochsPreSleep+numEpochsPostSleep);
+                SmoothedSVariableMatrix = NaN(num2select, numEpochsPreSleep+numEpochsPostSleep);
+                postSleepFeatureMatrix = [];
+
+                % Iterate through the selected nights again for normalisation and
+                % global sleep onset median calculation
+                for i = 1: length(rand_night_indices)
+
+                    % retrive the current night index and corresponding sleep onset
+                    curIdx = rand_night_indices(i);
+                    curSleepOnset = participantSubset.sleepOnsetIdx(curIdx);
+
+                    FeatureTrajectoryFallingAsleep = avgFtsStorage{i};
+                    numEpochs = length(FeatureTrajectoryFallingAsleep);
+                    NormalisedFeatureTrajectoryFallingAsleep = NaN(numEpochs, numFts);
+                    distPerNight = NaN(numEpochs, 1);
+
+                    % Perform feature normalisation
+                    for epch_idx = 1:numEpochs
+                        NormalisedFeatureTrajectoryFallingAsleep(epch_idx,:) =  (FeatureTrajectoryFallingAsleep(epch_idx, :) - meanFtsSelectedNights) ./ stdFtsSelectedNights;
+                    end
+
+                    normalisedFtTrajs{i} = NormalisedFeatureTrajectoryFallingAsleep;
+
+
+                    postOnsetFeatures = NormalisedFeatureTrajectoryFallingAsleep(curSleepOnset:end, :);
+                    postSleepFeatureMatrix = [postSleepFeatureMatrix; postOnsetFeatures];
+                end
+
+                % Calculate the median of feature values during sleep onset for the
+                % selected nights
+                medianSelectedNightsSleepOnset = median(postSleepFeatureMatrix, 1, 'omitmissing');
+             
+                % Store the median  in the table
+                predictionSummaryTableRow.Global_Median_Sleep_Onset = medianSelectedNightsSleepOnset;
+
+                for i = 1:length(rand_night_indices)
+
+                    curIdx = rand_night_indices(i);
+                    curSleepOnset = participantSubset.sleepOnsetIdx(curIdx);
+                    NormalisedFeatureTrajectoryFallingAsleep = normalisedFtTrajs{i};
+                    numEpochs = length(NormalisedFeatureTrajectoryFallingAsleep);
+
+                    distPerNight = NaN(numEpochs, 1);
+                    % Calculate the Euclidean distance
+                    for epch_idx = 1:numEpochs
+
+                        distPerNight(epch_idx, :) = pdist2(NormalisedFeatureTrajectoryFallingAsleep(epch_idx, :), medianSelectedNightsSleepOnset);
+
+
+                    end
+                    tvec_current = participantSubset.timeToSleepOnsetMinutes{curIdx};
+                    distPerNight1 = distPerNight(length(distPerNight)+1 - length(tvec_current):end);
+                    smoothedDistPerNight = smoothdata(distPerNight1, 'movmedian', [smoothingWindow, 0], 'omitmissing');
+
+
+
+                    SVariablesCell{i} = distPerNight1;
+                    SmoothedSVariablesCell{i} = smoothedDistPerNight;
+
+                    saveDirSVariablesSingleNights = [saveDirSVariables_night, '/', 'S Variables for Single Nights used for Average Calculation'];
+
+                    % Create the directory if it doesn't exist
+                    if ~exist(saveDirSVariablesSingleNights, 'dir')
+                        mkdir(saveDirSVariablesSingleNights);
+                    end
+
+
+                    %% Plot the raw S-variable traces
+
+                    tvec_current = participantSubset.timeToSleepOnsetMinutes{curIdx};
+                    handle = figure; % Open a new figure and store the handle in h
+                    hold on
+                    plot(tvec_current,distPerNight(length(distPerNight) - length(tvec_current)+1:end),'LineWidth',2, 'Color','k')
+                    set(gca,'FontSize', 16)
+                    set(gca,'TickDir','out')
+                    set(gca,'ticklength',2*get(gca,'ticklength'))
+                    set(gca,'lineWidth',2)
+                    ylabel('s')
+                    xlabel('Time (min)')
+                    ax = gca;
+                    line([0,0],ax.YLim,'LineStyle','--','LineWidth',2,'Color','r')
+
+
+                    % Construct the title with line breaks and the formatted string of nights
+                    graphTitle = {['Raw S-Variable From Night ', num2str(curIdx)]};
+
+                    % Set the title
+                    title(graphTitle, 'Interpreter', 'none');
+
+                    % Construct filenames for saving
+                    jpegFilename = fullfile(saveDirSVariablesSingleNights,['Night_', num2str(curIdx), 'RawSVariable', '.jpg']);
+                    figFilename = fullfile(saveDirSVariablesSingleNights, ['Night_', num2str(curIdx), 'RawSVariable' , '.fig']);
+                    svgFilename = fullfile(saveDirSVariablesSingleNights, ['Night_', num2str(curIdx),'RawSVariable' , '.svg']);
+
+
+                    % Save the plot as JPEG
+                    saveas(handle, jpegFilename);
+
+                    % Save the figure as .fig file
+                    savefig(handle, figFilename);
+
+                    % Save the plot as SVG
+                    saveas(handle, svgFilename);
+
+                    close(handle); % Close the figure
+
+                    %% Plot the smoothed S-variable traces
+                    handle = figure; % Open a new figure and store the handle in h
+                    hold on
+                    plot(tvec_current, smoothedDistPerNight(length(distPerNight) - length(tvec_current) + 1:end),'LineWidth',2, 'Color','k')
+                    set(gca,'FontSize', 16)
+                    set(gca,'TickDir','out')
+                    set(gca,'ticklength',2*get(gca,'ticklength'))
+                    set(gca,'lineWidth',2)
+                    ylabel('s')
+                    xlabel('Time (min)')
+                    ax = gca;
+                    line([0,0],ax.YLim,'LineStyle','--','LineWidth',2,'Color','r')
+
+
+                    % Construct the title with line breaks and the formatted string of nights
+                    graphTitle = {['Smoothed S-Variable From Night ', num2str(curIdx)]};
+
+                    % Set the title
+                    title(graphTitle, 'Interpreter', 'none');
+
+                    % Construct filenames for saving
+                    jpegFilename = fullfile(saveDirSVariablesSingleNights, ['Night_', num2str(curIdx), 'SmoothedSVariable', '.jpg']);
+                    figFilename = fullfile(saveDirSVariablesSingleNights, ['Night_', num2str(curIdx), 'SmoothedSVariable' , '.fig']);
+                    svgFilename = fullfile(saveDirSVariablesSingleNights, ['Night_', num2str(curIdx), 'SmoothedSVariable' , '.svg']);
+
+
+                    % Save the plot as JPEG
+                    saveas(handle, jpegFilename);
+
+                    % Save the figure as .fig file
+                    savefig(handle, figFilename);
+
+                    % Save the plot as SVG
+                    saveas(handle, svgFilename);
+
+                    close(handle); % Close the figure
+
+                    %% Plot the hypnogram
+                    allNightHypnogram = participantSubset.CleanSleepStagesInt{curIdx};
+
+                    sleepOnsetIndex = participantSubset.SleepOnsetIndex(curIdx);
+
+                    numSleepEpochsAfterSO = 10/0.5;
+
+                    if participantSubset.Time2Sleep(curIdx) > 30
+                        %% Plot last 30 minutes of participant's hypnogram
+
+
+                        if length(allNightHypnogram) >= sleepOnsetIndex+numSleepEpochsAfterSO
+                            selectedHypnogram_cut = allNightHypnogram(participantSubset.SleepOnsetIndex(curIdx)-30*2+1:(participantSubset.SleepOnsetIndex(curIdx) + numSleepEpochsAfterSO));
+                        else
+                            selectedHypnogram_cut = allNightHypnogram(participantSubset.SleepOnsetIndex(curIdx)-30*2+1:end);
+                        end
+
+                        timelineHypnogram_cut = linspace(-30, 10, length(selectedHypnogram_cut));
+
+                    else
+                        if length(allNightHypnogram) >= sleepOnsetIndex+numSleepEpochsAfterSO
+                            selectedHypnogram_cut = allNightHypnogram(1:sleepOnsetIndex+numSleepEpochsAfterSO);
+                        else
+                            selectedHypnogram_cut = allNightHypnogram(1:end);
+                        end
+                        timelineHypnogram_cut = linspace(-participantSubset.Time2Sleep(curIdx), 10, length(selectedHypnogram_cut));
+                    end
+
+
+                    if length(allNightHypnogram) >= sleepOnsetIndex+numSleepEpochsAfterSO
+                        HypnogramMatrix(i, max([1, 80-length(selectedHypnogram_cut)+1]):end) = selectedHypnogram_cut;
+                    else
+                        HypnogramMatrix(i, 1:length(selectedHypnogram_cut)) = selectedHypnogram_cut;
+                    end
+
+                    % Define sleep stage names
+                    stageNames = {'Awake', 'NREM Stage 1', 'NREM Stage 2', 'NREM Stage 3', 'NREM Stage 4', 'REM'};
+
+                    % Plot the hypnogram
+
+                    night_fig = figure;
+                    plot(timelineHypnogram_cut, selectedHypnogram_cut, 'b.-', 'LineWidth', 2);
+
+                    % Set y-axis labels
+                    set(gca, 'YTick', 0:5, 'YTickLabel', stageNames);
+
+                    set(gca,'FontSize', 14)
+                    set(gca,'TickDir','out')
+                    set(gca,'ticklength',2*get(gca,'ticklength'))
+                    set(gca,'lineWidth',2)
+                    grid on;
+
+                    % Set x and y-axis labels
+                    xlabel('Time (minutes)');
+                    %ylabel('Sleep Stage');
+
+
+                    % Construct the title with line breaks
+                    graphTitle = {'Sleep Stages Hypnogram', ...
+                        ['Participant ', participantName, ' on Night ', num2str(curIdx)],...
+                        ''};
+
+                    % Set the title
+                    title(graphTitle, 'Interpreter', 'none');
+
+                    ax = gca;
+
+                    ylim([-0.5,4.5])
+
+                    % Draw a vertical line at time 0
+                    line([0,0],ax.YLim,'LineStyle','--','LineWidth',2,'Color','r');
+
+
+
+                    % Add a legend
+                    %legend('Sleep Stages', 'Sleep Onset');
+
+                    % Construct filenames for saving
+                    jpegFilename = fullfile(saveDirSVariablesSingleNights, ['Night_', num2str(curIdx), '_Hypnogram', '.jpg']);
+                    figFilename = fullfile(saveDirSVariablesSingleNights, ['Night_', num2str(curIdx), '_Hypnogram','.fig']);
+                    svgFilename = fullfile(saveDirSVariablesSingleNights, ['Night_', num2str(curIdx), '_Hypnogram', '.fig']);
+                    % Save the plot as JPEG
+                    saveas(night_fig, jpegFilename);
+
+                    % Save the figure as .fig file
+                    savefig(night_fig, figFilename);
+
+                    saveas(night_fig, svgFilename)
+
+                    close(night_fig)
+
+                    %% Align the smoothed and raw S-variables around sleep onset for averaging later on
+
+                    SVariablePreSleep = distPerNight(1:curSleepOnset-1, :);
+                    SVariablePostSleep = distPerNight(curSleepOnset:end, :);
+
+                 
+
+                    if length(SVariablePreSleep) <= numEpochsPreSleep
+                        SVariableMatrix(i, (numEpochsPreSleep - length(SVariablePreSleep) + 1): numEpochsPreSleep) = SVariablePreSleep;
+                        SVariableMatrix(i, numEpochsPreSleep + 1: numEpochsPreSleep + length(SVariablePostSleep)) = SVariablePostSleep;
+                     
+                    else
+                        SVariableMatrix(i, 1: numEpochsPreSleep) = SVariablePreSleep(length(SVariablePreSleep) - numEpochsPreSleep + 1: end);
+                        SVariableMatrix(i, numEpochsPreSleep + 1: numEpochsPreSleep + length(SVariablePostSleep)) = SVariablePostSleep;
+                    
+                    end
+
+                end
+
+                % Calculate the  means of newly estimated S variables
+                rawMeanSVariable = mean(SVariableMatrix, 1, 'omitmissing');
+                AfterMeanSmoothedSVariable = smoothdata(rawMeanSVariable, 'movmedian', [smoothingWindow, 0], 'omitmissing');
+
+                meanSVariable = AfterMeanSmoothedSVariable - min(AfterMeanSmoothedSVariable);
+
+                % Calculate the mean hypnogram
+                meanHypnogram = mean(HypnogramMatrix, 1, 'omitmissing');
+
+
+                predictionSummaryTableRow.Mean_Hypnogram{1} = meanHypnogram;
+                predictionSummaryTableRow.Global_Minimum = min(AfterMeanSmoothedSVariable);
+                predictionSummaryTableRow.Mean_S_Variable{1} = meanSVariable;
+
+
+                %% Plot the resulting mean variables and save them
+
+
+                %% Plot the raw MeanSVariable
+                handle = figure; % Open a new figure and store the handle in h
+                hold on
+                plot(tvec,rawMeanSVariable(length(rawMeanSVariable) - length(tvec) + 1:end),'LineWidth',2, 'Color','k')
+                set(gca,'FontSize', 16)
+                set(gca,'TickDir','out')
+                set(gca,'ticklength',2*get(gca,'ticklength'))
+                set(gca,'lineWidth',2)
+                ylabel('s')
+                xlabel('Time (min)')
+                ax = gca;
+                line([0,0],ax.YLim,'LineStyle','--','LineWidth',2,'Color','r')
+               
+               
+                % Construct the title with line breaks
+                graphTitle = {'Raw Mean S-Variable ', ...
+                    ['across nights ', nightsStr]};
+
+                % Set the title
+                title(graphTitle, 'Interpreter', 'none');
+
+                % Construct filenames for saving
+                jpegFilename = fullfile(saveDirSVariables_night , ['_RawMeanSVariable', '.jpg']);
+                figFilename = fullfile(saveDirSVariables_night , [ '_RawMeanSVariable' , '.fig']);
+                svgFilename = fullfile(saveDirSVariables_night , ['_RawMeanSVariable' , '.svg']);
+
+                % Save the plot as JPEG
+                saveas(handle, jpegFilename);
+
+                % Save the figure as .fig file
+                savefig(handle, figFilename);
+
+                % Save the plot as SVG
+                saveas(handle, svgFilename);
+
+                close(handle); % Close the figure
+
+
+                % %% Plot the smoothed first MeanSVariable
+                % handle = figure; % Open a new figure and store the handle in h
+                % hold on
+                % plot(tvec,MeanSVariable,'LineWidth',2, 'Color','k')
+                % set(gca,'FontSize', 16)
+                % set(gca,'TickDir','out')
+                % set(gca,'ticklength',2*get(gca,'ticklength'))
+                % set(gca,'lineWidth',2)
+                % ylabel('s')
+                % xlabel('Time (min)')
+                % ax = gca;
+                % %ylim([0,8])
+                % line([0,0],ax.YLim,'LineStyle','--','LineWidth',2,'Color','r')
+                % %xlim([-60,10])
+                % %xticks([-60:10:10])
+                % %yl = ylim;
+                % %
+                % % xticks([62:200:max_ck_real+epc_postasleep+1])
+                % % xticklabels([-70:10:10])
+                %
+                % %for iii = 1:length(pvec_dist)
+                % %     tidx = iii+basetest_epc-1;
+                % %    tidx = iii+basetest_epc-1 - idxstartplot +1;
+                % %    if pvec_dist(iii) < p_th   % Significant
+                % %        line([tvec_plot(tidx),tvec_plot(tidx)+1],[0.95*yl(2),0.95*yl(2)],'color','k','linewidth',1)
+                % %    end
+                % %end
+                %
+                % % Construct the title with line breaks
+                % graphTitle = {'Smoothed Mean S-Variable', ...
+                %     '(smoothed before averaging)', ...
+                %     ['across nights ', nightsStr]};
+                %
+                % % Set the title
+                % title(graphTitle, 'Interpreter', 'none');
+                %
+                % % Construct filenames for saving
+                % jpegFilename = fullfile(saveDirSVariables, ['SmoothedFirstMeanSVariable', '.jpg']);
+                % figFilename = fullfile(saveDirSVariables, ['SmoothedFirstMeanSVariable' , '.fig']);
+                % svgFilename = fullfile(saveDirSVariables, ['SmoothedFirstMeanSVariable' , '.svg']);
+                %
+                %
+                % % Save the plot as JPEG
+                % saveas(handle, jpegFilename);
+                %
+                % % Save the figure as .fig file
+                % savefig(handle, figFilename);
+                %
+                % % Save the plot as SVG
+                % saveas(handle, svgFilename);
+                %
+                % close(handle); % Close the figure
+
+
+                %% Plot the smoothed first MeanSVariable
+                handle = figure; % Open a new figure and store the handle in h
+                hold on
+                plot(tvec,meanSVariable(length(rawMeanSVariable) - length(tvec) + 1:end),'LineWidth',2, 'Color','k')
+                set(gca,'FontSize', 16)
+                set(gca,'TickDir','out')
+                set(gca,'ticklength',2*get(gca,'ticklength'))
+                set(gca,'lineWidth',2)
+                ylabel('s')
+                xlabel('Time (min)')
+                ax = gca;
+                line([0,0],ax.YLim,'LineStyle','--','LineWidth',2,'Color','r')
+
+
+
+                % Construct the title with line breaks and the formatted string of nights
+                graphTitle = {'Smoothed Mean S-Variable', ...
+                    '(smoothed after averaging)', ...
+                    ['across nights ', nightsStr]};
+
+                % Set the title
+                title(graphTitle, 'Interpreter', 'none');
+
+                % Construct filenames for saving
+                jpegFilename = fullfile(saveDirSVariables_night , ['SmoothedAfterMeanSVariable', '.jpg']);
+                figFilename = fullfile(saveDirSVariables_night , ['SmoothedAfterMeanSVariable' , '.fig']);
+                svgFilename = fullfile(saveDirSVariables_night , ['SmoothedAfterMeanSVariable' , '.svg']);
+
+
+                % Save the plot as JPEG
+                saveas(handle, jpegFilename);
+
+                % Save the figure as .fig file
+                savefig(handle, figFilename);
+
+                % Save the plot as SVG
+                saveas(handle, svgFilename);
+
+                close(handle); % Close the figure
+
+
+                %% Plot the mean hypnogram
+                timelineHypnogram_cut = linspace(-30, 10, length(meanHypnogram));
+
+
+                night_fig = figure;
+                plot(timelineHypnogram_cut, meanHypnogram, 'b.-', 'LineWidth', 2);
+
+                % Set y-axis labels
+                set(gca, 'YTick', 0:5, 'YTickLabel', stageNames);
+
+                set(gca,'FontSize', 14)
+                set(gca,'TickDir','out')
+                set(gca,'ticklength',2*get(gca,'ticklength'))
+                set(gca,'lineWidth',2)
+                grid on;
+
+                % Set x and y-axis labels
+                xlabel('Time (minutes)');
+                %ylabel('Sleep Stage');
+
+
+                % Construct the title with line breaks
+                graphTitle = {'Sleep Stages Hypnogram', ...
+                    ['Participant ', participantName, ' on Night ', num2str(curIdx)],...
+                    ''};
+
+                % Set the title
+                title(graphTitle, 'Interpreter', 'none');
+
+                ax = gca;
+
+                ylim([-0.5,4.5])
+
+                % Draw a vertical line at time 0
+                line([0,0],ax.YLim,'LineStyle','--','LineWidth',2,'Color','r');
+
+
+
+                % Add a legend
+                %legend('Sleep Stages', 'Sleep Onset');
+
+                % Construct filenames for saving
+                jpegFilename = fullfile(saveDirSVariables_night , ['MeanHypnogram.jpg']);
+                figFilename = fullfile(saveDirSVariables_night , ['MeanHypnogram_', '.fig']);
+                svgFilename = fullfile(saveDirSVariables_night , ['MeanHypnogram_','.fig']);
+                % Save the plot as JPEG
+                saveas(night_fig, jpegFilename);
+
+                % Save the figure as .fig file
+                savefig(night_fig, figFilename);
+
+                saveas(night_fig, svgFilename)
+
+                close(night_fig)
+
+
+                %% Calculate the rest of the nigths and see whether it produces good dynamics
+
+                rest_of_indices = [];
+                for n_n = 1: length(non_empty_nights)
+                    if ~ismember(non_empty_nights(n_n), rand_night_indices)
+                        rest_of_indices = [rest_of_indices, non_empty_nights(n_n)];
+                    end
+                end
+
+
+                SVariablesCell = {};
+                HypnogramCell = {};
+                SVariableMatrix = NaN(num2select, numEpochsPreSleep+numEpochsPostSleep);
+                SmoothedSVariableMatrix = NaN(num2select, numEpochsPreSleep+numEpochsPostSleep);
+
+                postSleepFeatureMatrix = [];
+                cosine_similarities_array = NaN(num2select, 1);
+
+
+                dtw_scores_array = NaN(num2select, 1);
+
+                for i = 1:length(rest_of_indices)
+
+
+                    curIdx = rest_of_indices(i);
+
+
+                    if participantSubset.Time2Sleep(curIdx) > 30
+                        tvec = participantSubset.timeToSleepOnsetMinutes{curIdx};
+                        tvec = tvec(participantSubset.sleepOnsetIdx(curIdx)-30*20 + 1:end);
+                    end
+
+                    curSleepOnset = participantSubset.sleepOnsetIdx(curIdx);
+
+                    % Initialize a matrix to store the features for averaging
+                    featureMatrixFallingAsleep = NaN(height(participantSubset.FallingAsleepFeatures{curIdx}), numFts, length(SelectedChannels));
+
+                    % Loop through the specified EEG channels and accumulate the features
+                    for ch = 1:length(SelectedChannels)
+
+                        channelDataFallingAsleep = participantSubset.FallingAsleepFeatures{curIdx}.(SelectedChannels{ch});
+
+                        for f = 1:numFts
+                            % Extract the feature values for the current channel
+                            featureMatrixFallingAsleep(:, f, ch) = cellfun(@(x) x(f), channelDataFallingAsleep);
+                        end
+
+                    end
+
+                    % Calculate the average features across channels for each timepoint
+                    FeatureTrajectoryFallingAsleep = mean(featureMatrixFallingAsleep, 3, 'omitmissing');
+
+
+                    numEpochs = length(FeatureTrajectoryFallingAsleep);
+                    NormalisedFeatureTrajectoryFallingAsleep = NaN(numEpochs, numFts);
+                    distPerNight = NaN(numEpochs, 1);
+
+                    % Perform feature normalisation
+                    for epch_idx = 1:numEpochs
+                        NormalisedFeatureTrajectoryFallingAsleep(epch_idx,:) =  (FeatureTrajectoryFallingAsleep(epch_idx, :) - meanFtsSelectedNights) ./ stdFtsSelectedNights;
+
+                        distPerNight(epch_idx, :) = pdist2(NormalisedFeatureTrajectoryFallingAsleep(epch_idx, :), medianSelectedNightsSleepOnset);
+
+
+                    end
+
+                    tvec_current = participantSubset.timeToSleepOnsetMinutes{curIdx};
+                    distPerNight1 = distPerNight(length(distPerNight)+1 - length(tvec_current):end);
+           
+                    distPerNight1 = distPerNight1 - min(AfterMeanSmoothedSVariable);
+                    smoothedDistPerNight = smoothdata(distPerNight1, 'movmedian', [smoothingWindow, 0], 'omitmissing');
+                   
+
+
+                    SVariablesCell{i} = distPerNight1;
+                    SmoothedSVariablesCell{i} = smoothedDistPerNight;
+
+                    savePredDirSVariablesSingleNights = [savePredDirSVariables_night, '/', 'S Variables for Single Nights used for Average Calculation'];
+
+                    % Create the directory if it doesn't exist
+                    if ~exist(savePredDirSVariablesSingleNights, 'dir')
+                        mkdir(savePredDirSVariablesSingleNights);
+                    end
+
+
+                    %% Plot the raw S-variable traces
+                    tvec_current = participantSubset.timeToSleepOnsetMinutes{curIdx};
+                    handle = figure; % Open a new figure and store the handle in h
+                    hold on
+                    plot(tvec_current,distPerNight(length(distPerNight) - length(tvec_current)+1:end),'LineWidth',2, 'Color','k')
+                    set(gca,'FontSize', 16)
+                    set(gca,'TickDir','out')
+                    set(gca,'ticklength',2*get(gca,'ticklength'))
+                    set(gca,'lineWidth',2)
+                    ylabel('s')
+                    xlabel('Time (min)')
+                    ax = gca;
+                    line([0,0],ax.YLim,'LineStyle','--','LineWidth',2,'Color','r')
+
+                    % Construct the title with line breaks and the formatted string of nights
+                    graphTitle = {['Raw S-Variable From Night ', num2str(curIdx)]};
+
+                    % Set the title
+                    title(graphTitle, 'Interpreter', 'none');
+
+                    % Construct filenames for saving
+                    jpegFilename = fullfile(savePredDirSVariablesSingleNights,['Night_', num2str(curIdx), 'RawSVariable', '.jpg']);
+                    figFilename = fullfile(savePredDirSVariablesSingleNights, ['Night_', num2str(curIdx), 'RawSVariable' , '.fig']);
+                    svgFilename = fullfile(savePredDirSVariablesSingleNights, ['Night_', num2str(curIdx),'RawSVariable' , '.svg']);
+
+
+                    % Save the plot as JPEG
+                    saveas(handle, jpegFilename);
+
+                    % Save the figure as .fig file
+                    savefig(handle, figFilename);
+
+                    % Save the plot as SVG
+                    saveas(handle, svgFilename);
+
+                    close(handle); % Close the figure
+
+                    %% Plot the smoothed S-variable traces
+                    handle = figure; % Open a new figure and store the handle in h
+                    hold on
+                    plot(tvec_current, smoothedDistPerNight(length(distPerNight) - length(tvec_current) + 1:end),'LineWidth',2, 'Color','k')
+                    set(gca,'FontSize', 16)
+                    set(gca,'TickDir','out')
+                    set(gca,'ticklength',2*get(gca,'ticklength'))
+                    set(gca,'lineWidth',2)
+                    ylabel('s')
+                    xlabel('Time (min)')
+                    ax = gca;
+                    line([0,0],ax.YLim,'LineStyle','--','LineWidth',2,'Color','r')
+
+
+                    % Construct the title with line breaks and the formatted string of nights
+                    graphTitle = {['Smoothed S-Variable From Night ', num2str(curIdx)]};
+
+                    % Set the title
+                    title(graphTitle, 'Interpreter', 'none');
+
+                    % Construct filenames for saving
+                    jpegFilename = fullfile(savePredDirSVariablesSingleNights, ['Night_', num2str(curIdx), 'SmoothedSVariable', '.jpg']);
+                    figFilename = fullfile(savePredDirSVariablesSingleNights, ['Night_', num2str(curIdx), 'SmoothedSVariable' , '.fig']);
+                    svgFilename = fullfile(savePredDirSVariablesSingleNights, ['Night_', num2str(curIdx), 'SmoothedSVariable' , '.svg']);
+
+
+                    % Save the plot as JPEG
+                    saveas(handle, jpegFilename);
+
+                    % Save the figure as .fig file
+                    savefig(handle, figFilename);
+
+                    % Save the plot as SVG
+                    saveas(handle, svgFilename);
+
+                    close(handle); % Close the figure
+
+                    %% Plot the hypnogram
+                    allNightHypnogram = participantSubset.CleanSleepStagesInt{curIdx};
+
+                    sleepOnsetIndex = participantSubset.SleepOnsetIndex(curIdx);
+
+                    numSleepEpochsAfterSO = 10/0.5;
+
+                    if participantSubset.Time2Sleep(curIdx) > 30
+                        %% Plot last 30 minutes of participant's hypnogram
+
+
+                        if length(allNightHypnogram) >= sleepOnsetIndex+numSleepEpochsAfterSO
+                            selectedHypnogram_cut = allNightHypnogram(participantSubset.SleepOnsetIndex(curIdx)-30*2+1:(participantSubset.SleepOnsetIndex(curIdx) + numSleepEpochsAfterSO));
+                        else
+                            selectedHypnogram_cut = allNightHypnogram(participantSubset.SleepOnsetIndex(curIdx)-30*2+1:end);
+                        end
+
+                        timelineHypnogram_cut = linspace(-30, 10, length(selectedHypnogram_cut));
+
+                    else
+                        if length(allNightHypnogram) >= sleepOnsetIndex+numSleepEpochsAfterSO
+                            selectedHypnogram_cut = allNightHypnogram(1:sleepOnsetIndex+numSleepEpochsAfterSO);
+                        else
+                            selectedHypnogram_cut = allNightHypnogram(1:end);
+                        end
+                        timelineHypnogram_cut = linspace(-participantSubset.Time2Sleep(curIdx), 10, length(selectedHypnogram_cut));
+                    end
+
+                    HypnogramCell{i} = selectedHypnogram_cut;
+
+                    if length(allNightHypnogram) >= sleepOnsetIndex+numSleepEpochsAfterSO
+                        HypnogramMatrix(i, max([1, 80-length(selectedHypnogram_cut)+1]):end) = selectedHypnogram_cut;
+                    else
+                        HypnogramMatrix(i, 1:length(selectedHypnogram_cut)) = selectedHypnogram_cut;
+                    end
+
+                    % Define sleep stage names
+                    stageNames = {'Awake', 'NREM Stage 1', 'NREM Stage 2', 'NREM Stage 3', 'NREM Stage 4', 'REM'};
+
+                    % Plot the hypnogram
+
+                    night_fig = figure;
+                    plot(timelineHypnogram_cut, selectedHypnogram_cut, 'b.-', 'LineWidth', 2);
+
+                    % Set y-axis labels
+                    set(gca, 'YTick', 0:5, 'YTickLabel', stageNames);
+
+                    set(gca,'FontSize', 14)
+                    set(gca,'TickDir','out')
+                    set(gca,'ticklength',2*get(gca,'ticklength'))
+                    set(gca,'lineWidth',2)
+                    grid on;
+
+                    % Set x and y-axis labels
+                    xlabel('Time (minutes)');
+                    %ylabel('Sleep Stage');
+
+
+                    % Construct the title with line breaks
+                    graphTitle = {'Sleep Stages Hypnogram', ...
+                        ['Participant ', participantName, ' on Night ', num2str(curIdx)],...
+                        ''};
+
+                    % Set the title
+                    title(graphTitle, 'Interpreter', 'none');
+
+                    ax = gca;
+
+                    ylim([-0.5,4.5])
+
+                    % Draw a vertical line at time 0
+                    line([0,0],ax.YLim,'LineStyle','--','LineWidth',2,'Color','r');
+
+                    % Add a legend
+                    %legend('Sleep Stages', 'Sleep Onset');
+
+                    % Construct filenames for saving
+                    jpegFilename = fullfile(savePredDirSVariablesSingleNights, ['Night_', num2str(curIdx), '_Hypnogram', '.jpg']);
+                    figFilename = fullfile(savePredDirSVariablesSingleNights, ['Night_', num2str(curIdx), '_Hypnogram','.fig']);
+                    svgFilename = fullfile(savePredDirSVariablesSingleNights, ['Night_', num2str(curIdx), '_Hypnogram', '.fig']);
+                    % Save the plot as JPEG
+                    saveas(night_fig, jpegFilename);
+
+                    % Save the figure as .fig file
+                    savefig(night_fig, figFilename);
+
+                    saveas(night_fig, svgFilename)
+
+                    close(night_fig)
+
+                    %% Calculate the degree of similarity (cosine similarity and DTW distance) with local S-variable
+                    Local_S_variable = participantSubset.S_variable{curIdx};
+
+
+                    smoothed_Local_S_variable =  smoothdata(Local_S_variable, 'movmedian', [smoothingWindow, 0], 'omitmissing');
+                    Local_S_variable = Local_S_variable - min(smoothed_Local_S_variable);
+                    smoothed_Local_S_variable = smoothed_Local_S_variable - min(smoothed_Local_S_variable);
+
+
+                    if length(distPerNight) == length(Local_S_variable)
+
+                        % Impute with last observation carried forward
+                        imputedDistPerNight = fillmissing(distPerNight, "previous");
+                        imputedLocal = fillmissing(Local_S_variable, "previous");
+
+                        imputedDistPerNight = fillmissing(imputedDistPerNight, "next");
+                        imputedLocal = fillmissing(imputedLocal, "next");
+
+                        % Normalise it by subtracting the minimum
+                        Normalised_DistPerNight= (imputedDistPerNight - mean(imputedDistPerNight))/ std(imputedDistPerNight);
+                        Normalised_Local_S_variable = (imputedLocal - mean(imputedLocal))/ std(imputedLocal);
+
+                        % Calculate the inner product
+                        innerProduct = dot(Normalised_DistPerNight, Normalised_Local_S_variable);
+
+                        % Calculate the magnitudes (Euclidean norms) of the normalised
+                        % variables
+                        norm_DistPerNight = norm(Normalised_DistPerNight);
+                        norm_Local = norm(Normalised_Local_S_variable);
+
+                        % Calculate the cosine similarity
+                        cosineSimilarity = innerProduct/(norm_DistPerNight * norm_Local);
+
+                        % Display the result
+                        disp(['The cosine similarity for night ',num2str(curIdx), ' is: ' num2str(cosineSimilarity)])
+                        cosine_similarities_array(i) = cosineSimilarity;
+                        allCosineSimilarityScoresParticipant = [allCosineSimilarityScoresParticipant, cosineSimilarity];
+                        % Record the calculated inner product
+                        Similarity.Cosine_Similarity_S_Variable(i) = cosineSimilarity;
+
+
+                        % Calculate the DTW distance
+                        [dist, IX,IY] = dtw(Normalised_DistPerNight, Normalised_Local_S_variable);
+
+                        disp(['DTW distance: ', num2str(dist)])
+
+                        Similarity.DTW_S_Variable(i) = dist;
+                        dtw_scores_array(i) = dist;
+                        SVariablesCell{i} = distPerNight;
+                    else
+                        continue
+                    end
+
+                    predictionSummaryTableRow.Night_Hypnograms{1} = HypnogramCell;
+                    predictionSummaryTableRow.Estimated_S_variables{1} = SVariablesCell;
+
+
+                    %% Plot the raw Local S-variable traces
+
+                    %% Plot the smoothed S-variable traces with local smoothed S-variable
+                    handle = figure; % Open a new figure and store the handle in h
+                    hold on;
+                    plot(tvec_current, distPerNight1(length(distPerNight1) - length(tvec_current) + 1:end), 'LineWidth', 2, 'Color', 'k');
+                    plot(tvec_current, Local_S_variable(length(distPerNight1) - length(tvec_current) + 1:end), 'LineWidth', 2, 'Color', 'r'); % Assuming smoothed_local_s_variable is defined
+                    set(gca, 'FontSize', 16);
+                    set(gca, 'TickDir', 'out');
+                    set(gca, 'ticklength', 2*get(gca, 'ticklength'));
+                    set(gca, 'lineWidth', 2);
+                    ylabel('s');
+                    xlabel('Time (min)');
+                    ax = gca;
+                    line([0,0], ax.YLim, 'LineStyle', '--', 'LineWidth', 2, 'Color', 'r');
+
+                    % Construct the title with line breaks and the formatted string of nights, including cosine similarity and DTW distance
+                    graphTitle = {'Locally calculated (red) vs',...
+                        'Externally calculated (black)  S-Variable', ...
+                        ['From Night ', num2str(curIdx), ' using ', num2str(num2select),' nights'], ...
+                        ['Cosine Similarity = ', num2str(cosineSimilarity)], ...
+                        [' DTW Distance = ', num2str(dist)]};
+                    title(graphTitle, 'Interpreter', 'none');
+
+                    % Construct filenames for saving
+                    jpegFilename = fullfile(savePredDirSVariablesSingleNights, ['Night_', num2str(curIdx), 'LocalRawSVariable', '.jpg']);
+                    figFilename = fullfile(savePredDirSVariablesSingleNights, ['Night_', num2str(curIdx), 'LocalRawSVariable' , '.fig']);
+                    svgFilename = fullfile(savePredDirSVariablesSingleNights, ['Night_', num2str(curIdx), 'LocalRawSVariable' , '.svg']);
+
+                    % Save the plot as JPEG
+                    saveas(handle, jpegFilename);
+
+                    % Save the figure as .fig file
+                    savefig(handle, figFilename);
+
+                    % Save the plot as SVG
+                    saveas(handle, svgFilename);
+
+                    close(handle); % Close the figure
+
+                    %% Plot the smoothed S-variable traces
+                    %% Plot the smoothed S-variable traces with local smoothed S-variable
+                    handle = figure; % Open a new figure and store the handle in h
+                    hold on;
+                    plot(tvec_current, smoothedDistPerNight(length(distPerNight) - length(tvec_current) + 1:end), 'LineWidth', 2, 'Color', 'k');
+                    plot(tvec_current, smoothed_Local_S_variable(length(distPerNight) - length(tvec_current) + 1:end), 'LineWidth', 2, 'Color', 'r'); % Assuming smoothed_local_s_variable is defined
+                    set(gca, 'FontSize', 16);
+                    set(gca, 'TickDir', 'out');
+                    set(gca, 'ticklength', 2*get(gca, 'ticklength'));
+                    set(gca, 'lineWidth', 2);
+                    ylabel('s');
+                    xlabel('Time (min)');
+                    ax = gca;
+                    line([0,0], ax.YLim, 'LineStyle', '--', 'LineWidth', 2, 'Color', 'r');
+
+                    % Construct the title with line breaks and the formatted string of nights, including cosine similarity and DTW distance
+                    graphTitle = {'Locally calculated (red) vs',...
+                        'Externally calculated (black)  S-Variable', ...
+                        ['From Night ', num2str(curIdx),  ' using ', num2str(num2select),' nights' ], ...
+                        ['Cosine Similarity = ', num2str(cosineSimilarity)], ...
+                        [' DTW Distance = ', num2str(dist)]};
+                    title(graphTitle, 'Interpreter', 'none');
+
+                    % Construct filenames for saving
+                    jpegFilename = fullfile(savePredDirSVariablesSingleNights, ['Night_', num2str(curIdx), 'LocalSmoothedSVariable', '.jpg']);
+                    figFilename = fullfile(savePredDirSVariablesSingleNights, ['Night_', num2str(curIdx), 'LocalSmoothedSVariable' , '.fig']);
+                    svgFilename = fullfile(savePredDirSVariablesSingleNights, ['Night_', num2str(curIdx), 'LocalSmoothedSVariable' , '.svg']);
+
+                    % Save the plot as JPEG
+                    saveas(handle, jpegFilename);
+
+                    % Save the figure as .fig file
+                    savefig(handle, figFilename);
+
+                    % Save the plot as SVG
+                    saveas(handle, svgFilename);
+
+                    close(handle); % Close the figure
+
+                end
+
+                num2selectvec = repelem(num2select, length(rest_of_indices));
+
+                all_scores_nigths_vec = [all_scores_nigths_vec, num2selectvec];
+                average_cosine_score = mean(cosine_similarities_array, 'omitmissing');
+                average_dtw_score = mean(dtw_scores_array, 'omitmissing');
+
+                averageCosineSimilarityScoresParticipant(seed_idx, num2select) = average_cosine_score;
+
+                predictionSummaryTableRow.AverageCosineSimilarity = average_cosine_score;
+                predictionSummaryTableRow.AverageDTWDistance = average_dtw_score;
+
+                predictionSummaryTableRow.Cosine_Similarity_Array_S_Variable{1} = cosine_similarities_array;
+                predictionSummaryTableRow.DTW_S_Array_Variable{1} = dtw_scores_array;
+
+                predictionSummaryTable = [predictionSummaryTable; predictionSummaryTableRow];
+                
+                % Optionally, save the new table to the file
+                save(FixedfilePath, 'predictionSummaryTable');
+
+
+            end
+        
+        end
+        
+        finalAverageCosineSimilarityScoresParticipant = mean(averageCosineSimilarityScoresParticipant, 1);
+
+    end
+    prev_num_nights = min(sum(non_empty_mask), 7);
+    num_prev_part_nights = num_prev_part_nights + prev_num_nights*5;
+
+    if ~if_fixing_table
+
+        average_cosine_scores_mat(part, :) = finalAverageCosineSimilarityScoresParticipant;
+
+        averageCosineSimilarityScoresAll = [averageCosineSimilarityScoresAll, averageCosineSimilarityScoresParticipant];
+        cosineSimilarityAll = [cosineSimilarityAll, allCosineSimilarityScoresParticipant];
+
+        num_nights_vec = 1:num_nights_available;
+
+        num_night_vec_all = [num_night_vec_all, num_nights_vec];
+        all_nums = [all_nums, all_scores_nigths_vec];
+
+        %% Plot the aver
+        handle = figure; % Open a new figure and store the handle in h
+
+        hold on
+        plotting_mask = ~isnan(finalAverageCosineSimilarityScoresParticipant);
+        scatter(num_nights_vec(plotting_mask), finalAverageCosineSimilarityScoresParticipant(plotting_mask), 'b', 'filled')
+        ax = gca;
+        h1 = lsline(ax);
+        h1.LineWidth = 2;
+        h1.Color = 'k';
+        h1.LineStyle = '--';
+
+
+        set(gca,'FontSize', 16)
+        set(gca,'TickDir','out')
+        set(gca,'ticklength',2*get(gca,'ticklength'))
+        set(gca,'lineWidth',2)
+        set(gca, 'Box', 'off')
+        set(gca, 'FontName', 'Helvetica')
+        ylabel('Cosine Similarity')
+        xlabel('Number of Nights')
+        xlim([0,8])
+
+        %ylim([0,8])
+
+        % Construct the title with line breaks
+        graphTitle = {'Average Cosine Similarity vs Number of Nights used for modelling', ...
+            ['Participant ', num2str(participantName)]};
+        % Set the title
+        title(graphTitle, 'Interpreter', 'none');
+
+        % Construct filenames for saving
+        jpegFilename = fullfile(saveDirParticipant, ['Participant_', participantName, '_AverageCosineSimilarity.jpg']);
+        figFilename = fullfile(saveDirParticipant, ['Participant_', participantName, '_AverageCosineSimilarity.fig']);
+
+        % Save the plot as JPEG
+        saveas(handle, jpegFilename);
+
+        % Save the figure as .fig file
+        savefig(handle, figFilename);
+
+        close(handle); % Close the figure
+
+
+
+
+        handle = figure; % Open a new figure and store the handle in h
+
+        scatter(all_scores_nigths_vec,allCosineSimilarityScoresParticipant, 'b', 'filled')
+        ax = gca;
+        h1 = lsline(ax);
+        h1.LineWidth = 2;
+        h1.Color = 'k';
+        h1.LineStyle = '--';
+
+        set(gca,'FontSize', 16)
+        set(gca,'TickDir','out')
+        set(gca,'ticklength',2*get(gca,'ticklength'))
+        set(gca,'lineWidth',2)
+        set(gca, 'Box', 'off')
+        set(gca, 'FontName', 'Helvetica')
+        ylabel('Cosine Similarity')
+        xlabel('Number of Nights')
+        xlim([0,8])
+        ax = gca;
+        %ylim([0,8])
+
+        % Construct the title with line breaks
+        graphTitle = {'All Cosine Similarity Scores vs Number of Nights used for modelling', ...
+            ['Participant ', num2str(participantName)]};
+        % Set the title
+        title(graphTitle, 'Interpreter', 'none');
+
+        % Construct filenames for saving
+        jpegFilename = fullfile(saveDirParticipant, ['Participant_', participantName, '_AllCosineSimilarity.jpg']);
+        figFilename = fullfile(saveDirParticipant, ['Participant_', participantName, '_AllCosineSimilarity.fig']);
+
+        % Save the plot as JPEG
+        saveas(handle, jpegFilename);
+
+        % Save the figure as .fig file
+        savefig(handle, figFilename);
+
+        close(handle); % Close the figure
+
+
+        %% Save the variables with cosine scores
+        save(fullfile([saveDir, 'averageCosineSimilarityScoresAllUpdated.mat']),'averageCosineSimilarityScoresAll');
+        save(fullfile([saveDir, 'cosineSimilarityAllUpdated.mat']), 'cosineSimilarityAll');
+        save(fullfile([saveDir, 'num_night_vec_allUpdated.mat']), 'num_night_vec_all');
+        save(fullfile([saveDir, 'all_numsUpdated.mat']), 'all_nums');
+        save(fullfile([saveDir, 'average_cosine_scores_matUpdated.mat']), 'average_cosine_scores_mat');
+        save(fullfile([saveDir, 'excluded_participantsUpdated.mat']), 'excluded_participants');
+
+    end
+end
+if ~if_fixing_table
+    mean_cosine_scores = mean(average_cosine_scores_mat, 1,'omitnan');
+
+
+    handle = figure; % Open a new figure and store the handle in h
+
+    scatter(1:8,mean_cosine_scores, 'b', 'filled')
+    ax = gca;
+    h1 = lsline(ax);
+    h1.LineWidth = 2;
+    h1.Color = 'k';
+    h1.LineStyle = '--';
+
+    set(gca,'FontSize', 16)
+    set(gca,'TickDir','out')
+    set(gca,'ticklength',2*get(gca,'ticklength'))
+    set(gca,'lineWidth',2)
+    set(gca, 'Box', 'off')
+    set(gca, 'FontName', 'Helvetica')
+    ylabel('Cosine Similarity')
+    xlabel('Number of Nights')
+    xlim([0,8])
+    ax = gca;
+    %ylim([0,8])
+
+    % Construct the title with line breaks
+    graphTitle = {'Average Cosine Similarity Scores vs Number of Nights'};
+    % Set the title
+    title(graphTitle, 'Interpreter', 'none');
+
+    % Construct filenames for saving
+    jpegFilename = fullfile(saveDir, 'AverageCosineSimilarityUpdated.jpg');
+    figFilename = fullfile(saveDir, 'AverageCosineSimilarityUpdated.fig');
+
+    % Save the plot as JPEG
+    saveas(handle, jpegFilename);
+
+    % Save the figure as .fig file
+    savefig(handle, figFilename);
+
+    close(handle); % Close the figure
+
+    % Assuming all_nums and cosineSimilarityAll are defined
+    % all_nums should be the categorical variable (x-axis)
+    % cosineSimilarityAll should be the data variable (y-axis)
+
+    % Add path to the violinplot function (update the path as needed)
+    addpath('/home/anastasia/Dropbox/ISN work/Work on new dataset/Critical Point Prediction Corrected');
+
+    % Open a new figure
+    handle = figure;
+
+    % Create a violin plot
+    violinplot(cosineSimilarityAll, all_nums);
+
+    % Customize the plot appearance
+    ax = gca;
+    set(gca, 'FontSize', 16);
+    set(gca, 'TickDir', 'out');
+    set(gca, 'TickLength', 2 * get(gca, 'TickLength'));
+    set(gca, 'LineWidth', 2);
+    set(gca, 'Box', 'off');
+    set(gca, 'FontName', 'Helvetica');
+    set(gca, 'YScale', 'log');
+    ylabel('Cosine Similarity');
+    xlabel('Number of Nights');
+    xlim([0, 8]);
+
+    % Construct the title with line breaks
+    graphTitle = {'Average Cosine Similarity Scores vs Number of Nights'};
+    % Set the title
+    title(graphTitle, 'Interpreter', 'none');
+
+    % Construct filenames for saving
+    jpegFilename = fullfile(saveDir, 'AllCosineSimilarityViolinPlotLogUpdated.jpg');
+    figFilename = fullfile(saveDir, 'AllCosineSimilarityViolinPlotLogUpdated.fig');
+
+    % Save the plot as JPEG
+    saveas(handle, jpegFilename);
+
+    % Save the figure as .fig file
+    savefig(handle, figFilename);
+
+    % Close the figure
+    close(handle);
+
+
+    % Assuming all_nums and cosineSimilarityAll are defined
+    % all_nums should be the categorical variable (x-axis)
+    % cosineSimilarityAll should be the data variable (y-axis)
+
+    % Open a new figure
+    handle = figure;
+
+    % Create a box plot
+    boxplot(cosineSimilarityAll, all_nums,  'Widths', 0.5, 'Whisker', 1.5);
+
+    % Hold the current plot
+    hold on;
+
+    % % Overlay mean points for each category
+    % categories = unique(all_nums);
+    % mean_values = zeros(length(categories), 1);
+    % for i = 1:length(categories)
+    %     category = categories(i);
+    %     mean_values(i) = mean(cosineSimilarityAll(all_nums == category));
+    % end
+    % plot(categories, mean_values, 'ro', 'MarkerSize', 8, 'MarkerFaceColor', 'r');
+
+    % Customize the plot appearance
+    ax = gca;
+    set(gca, 'FontSize', 16);
+    set(gca, 'TickDir', 'out');
+    set(gca, 'TickLength', 2 * get(gca, 'TickLength'));
+    set(gca, 'LineWidth', 2);
+    set(gca, 'Box', 'off');
+    %set(gca, 'YScale', 'log');
+    set(gca, 'FontName', 'Helvetica');
+    ylabel('Cosine Similarity');
+    xlabel('Number of Nights');
+    xlim([0, 8]);
+
+    % Optional: Set the y-axis to a logarithmic scale if needed
+    % set(gca, 'YScale', 'log');
+
+    % Construct the title with line breaks
+    graphTitle = {'Average Cosine Similarity Scores vs Number of Nights'};
+    % Set the title
+    title(graphTitle, 'Interpreter', 'none');
+
+    % Construct filenames for saving
+    jpegFilename = fullfile(saveDir, 'AllCosineSimilarity_BoxPlotUpdated.jpg');
+    figFilename = fullfile(saveDir, 'AllCosineSimilarity_BoxPlotUpdated.fig');
+
+    % Save the plot as JPEG
+    saveas(handle, jpegFilename);
+
+    % Save the figure as .fig file
+    savefig(handle, figFilename);
+
+    % Close the figure
+    close(handle);
+
+
+
+
+
+
+
+
+
+
+    handle = figure; % Open a new figure and store the handle in h
+
+    scatter(all_nums,cosineSimilarityAll, 'b', 'filled')
+    ax = gca;
+    h1 = lsline(ax);
+    h1.LineWidth = 2;
+    h1.Color = 'k';
+    h1.LineStyle = '--';
+
+    set(gca,'FontSize', 16)
+    set(gca,'TickDir','out')
+    set(gca,'ticklength',2*get(gca,'ticklength'))
+    set(gca,'lineWidth',2)
+    set(gca, 'Box', 'off')
+    set(gca, 'FontName', 'Helvetica')
+    ylabel('Cosine Similarity')
+    xlabel('Number of Nights')
+    xlim([0,8])
+    ax = gca;
+    %ylim([0,8])
+
+    % Construct the title with line breaks
+    graphTitle = {'Average Cosine Similarity Scores vs Number of Nights'};
+    % Set the title
+    title(graphTitle, 'Interpreter', 'none');
+
+    % Construct filenames for saving
+    jpegFilename = fullfile(saveDir, 'AllCosineSimilarityUpdated.jpg');
+    figFilename = fullfile(saveDir, 'AllCosineSimilarityUpdated.fig');
+
+    % Save the plot as JPEG
+    saveas(handle, jpegFilename);
+
+    % Save the figure as .fig file
+    savefig(handle, figFilename);
+
+    close(handle); % Close the figure
+end
+
+%% Functions
+
+% Mean square error to fit
+function err = minerror(params,tvec,xx,x_ini)
+err = 0;
+xoverFcn = @(T,Y) MyEventFunction(T,Y);
+options = odeset('RelTol',1e-15,'AbsTol',1e-15,'Events',xoverFcn);
+
+tic
+
+[~,dd] = ode45(@(t,x) harvest(t,x,params),tvec-min(tvec),x_ini,options);
+
+if isempty(dd)
+    err=NaN;
+    return
+end
+err = mean((dd(:,1) - xx').^2);
+
+end
+
+% function dxdt = harvest(t,x,params)
+%
+% r = params(1);
+% K = params(2);
+% h= params(3);
+% m = params(4);
+% dxdt = zeros(2,1);
+% dxdt(1) = r*x(1)*(1-x(1)/K) - x(2)*(x(1)^2/(x(1)^2+h^2));
+% dxdt(2) = m;
+%
+% end
+
+function [VALUE, ISTERMINAL, DIRECTION] = MyEventFunction(T,Y)
+%The event function stops when VALUE == 0 and
+%ISTERMINAL==1
+%a. Define the timeout in seconds
+TimeOut = 10;
+%
+%b. The solver runs until this VALUE is negative (does not change the sign)
+VALUE = toc-TimeOut;
+%c. The function should terminate the execution, so
+ISTERMINAL = 1;
+%d. The direction does not matter
+DIRECTION = 0;
+end
+
+
+
