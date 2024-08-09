@@ -34,9 +34,9 @@ Before you start to run analysis or plotting, make sure that you add the entire 
 
 2. "*Process Codes (NoData)*": This folder contains the process codes to read, process, and analysis of the raw sleep data. The raw sleep data should be obtained as specified previously, no data has been given here.
 
-3.  "*Final Plot codes*": This folder includes all the codes for generating the main figures of the manuscript.
+3.  "*Final Plot codes*": This folder includes all the codes for generating the main figures as well as Supplementary figures (excluding demographics) of the manuscript.
 
-4. "*All Final Data for plots*": This folder contains all the data necessary for generating plots only. No raw data has been included. 
+4. "*All Final Data for plots*": This folder only contains all the data necessary for generating plots (Used for codes in the 'Final plots codes' folder). No raw data has been included. 
 
 ## Folder details
 
