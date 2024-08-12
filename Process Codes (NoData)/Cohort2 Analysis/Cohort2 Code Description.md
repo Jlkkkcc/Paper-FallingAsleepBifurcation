@@ -35,8 +35,8 @@
 1. **Run `feature_extraction_full_falling_asleep.m`.**  It requires `ArtifactFtEEGFallingAsleep_{participantID}.mat` files to run and outputs an updated version of `ArtifactFtEEGFallingAsleep_{participantID}.mat` with feature-based representations of EEG.
 2. **Run `feature_extraction_full_falling_asleep.m`.**  It requires `ArtifactFtEEGFallingAsleep_{participantID}.mat` files to run and outputs an updated version of `ArtifactFtEEGFallingAsleep_{participantID}.mat` with artifact-cleaned version of feature-based representations of EEG.
 
-## PredictionAnalysis: How to use Feature-Based EEG representation for S-variable calculation, bifurcation fitting and prediction? 
-### S-variable Calculation 
+## PredictionAnalysis: How to use Feature-Based EEG representation for Sleep Distance calculation, bifurcation fitting and prediction? 
+### Sleep Distance (S-Variable) Calculation 
 **Run `S_variable_calculation_on_clean.m`.**  It requires `ArtifactFtEEGFallingAsleep_{participantID}.mat` files to run and outputs an updated version of `ArtifactFtEEGFallingAsleep_{participantID}.mat` with calculated true S-Variable.
 
 ### Bifurcation Fitting on true S-Variable
