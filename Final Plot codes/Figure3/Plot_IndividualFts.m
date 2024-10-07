@@ -4,20 +4,20 @@
 
 clear all
 clc
-% load ftdynam_6ssampOvlap3s_Onset1minCorrAlign_N200_FPCA_revMay2024.mat
+
 load FPCADynamics.mat
 load ftdscrp.mat   % The feature code names to match the index
 
-%% Individual feature time-series plots-46
+%% Individual feature time-series plots-15
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Change this to match the feature you want to plot
 % The four key feature indexes used in the paper:
-% FPC1: Total EEG power (41), Spectrum centroid (46)
+% FPC1: Total EEG power (41), Peak beta band frequency (15)
 % FPC2: Delta-to-Alpha ratio (6), Theta temporal coherence (17)
 
 % Refer to description (ft_dscrp) to match feature indexes with names
-ft_to_plot = 46;
+ft_to_plot = 15;
 
 % ftall_mat_allnorm_strm = ftall_mat_allnorm(:,time_start_sampenough:end);
 tvec = -(max_ck_real-1)/20:0.05:10.5;
@@ -31,10 +31,10 @@ xlabel('Time (min)')
 ylabel('z-score')
 hold on
 line(xlim,[0 0],'Color','k','LineStyle','--','LineWidth',1.5)
-line([0,0],ylim,'Color','r','LineStyle','--','LineWidth',1.5)
 
-ylim([-0.5,2])
-yticks([-0.5:0.5:2])
+ylim([-0.4,1.6])
+yticks([-0.4:0.4:1.6])
+line([0,0],ylim,'Color','r','LineStyle','--','LineWidth',1.5)
 xlim([-60,10])
 box off
 set(gca,'FontSize', 12)

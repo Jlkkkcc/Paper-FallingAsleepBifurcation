@@ -15,12 +15,12 @@ load FPCADynamics.mat
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Change this to match the feature you want to plot
 % The four key feature indexes used in the paper:
-% FPC1: Total EEG power (41), Spectrum centroid (46)
+% FPC1: Total EEG power (41), Peak beta band frequency (15)
 % FPC2: Delta-to-Alpha ratio (6), Theta temporal coherence (17)
 
 % Refer to description (ft_dscrp) to match feature indexes with names for
 % other features
-ctr_ft = 17;
+ctr_ft = 15;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 tvec = -(max_ck_real-1)/20:0.05:10.5;
@@ -55,6 +55,9 @@ gg(pltrange,:) = repmat([1,0,0],length(pltrange),1);
 colormap(gg)
 ylim([0,5])
 yticks([0:5])
+
+xlim([-0.4,1.6])
+xticks([-0.4:0.4:1.6])
 
 % clabel('Time (min)')
 
