@@ -58,11 +58,11 @@ load SuppFig7.mat
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Please choose the feature combination to plot 
-ftn = [6,17,41,46];     % All key FPCA feature index
+ftn = [6,17,41,15];     % All key FPCA feature index
 
 % Which 2 feature combination to plot
-fttest1 = 3;
-fttest2 = 4;
+fttest1 = 4;
+fttest2 = 3;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Time to plot
