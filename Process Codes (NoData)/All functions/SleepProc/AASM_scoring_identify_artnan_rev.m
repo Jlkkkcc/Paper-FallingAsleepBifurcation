@@ -1,4 +1,4 @@
-function [base_per,  Onset_per, ifgood, stp_point ,stp_ori ,msg] = AASM_scoring_identify_artnan(scoring, data, ep_size,stage,cont_epc)
+function [base_per,  Onset_per, ifgood, stp_point ,stp_ori ,msg] = AASM_scoring_identify_artnan_rev(scoring, data, ep_size,stage,cont_epc)
 
 % This function is used to identify scoring based on AASM criterion of EEG
 % data, and extractes first minute N1 recording, and first minute N2 recording
