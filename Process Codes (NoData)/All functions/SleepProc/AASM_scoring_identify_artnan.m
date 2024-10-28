@@ -114,7 +114,7 @@ if Stage_start >= max_num_epc-cont_epc+2
     return
 end
 % Find first continuous stage minute
-while sum(scoring_clean(Stage_start:Stage_start+cont_epc-1)) < sum_cont && id_Onset<max_loop
+while (sum(scoring_clean(Stage_start:Stage_start+cont_epc-1)) < sum_cont || sum(scoring_clean(Stage_start:Stage_start+cont_epc-1))>6)&& id_Onset<max_loop
     id_Onset = id_Onset+1;
     Stage_start = find(scoring_clean == stage_num, id_Onset);
     if length(Stage_start)<id_Onset
@@ -129,7 +129,7 @@ while sum(scoring_clean(Stage_start:Stage_start+cont_epc-1)) < sum_cont && id_On
         return
     end
 end
-if sum(scoring_clean(Stage_start:Stage_start+cont_epc-1)) < sum_cont
+if sum(scoring_clean(Stage_start:Stage_start+cont_epc-1)) < sum_cont || sum(scoring_clean(Stage_start:Stage_start+cont_epc-1))>6
     ifgood = 0;
     msg = 'No continuous 1min sleep stage found';
     return
