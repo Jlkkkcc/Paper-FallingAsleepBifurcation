@@ -24,7 +24,6 @@ max_ck_real = data_dict["max_ck_real"]
 #%% FPCA analysis
 
 import skfda 
-from skfda.datasets import fetch_growth
 from skfda.exploratory.visualization import FPCAPlot
 from skfda.preprocessing.dim_reduction.feature_extraction import FPCA
 from skfda.representation.basis import BSpline, Fourier, Monomial
@@ -69,7 +68,7 @@ reg = L2Regularization()
 
 n_cmp = 2;   #Number of components
 
-fpca_reg = FPCA(n_components=n_cmp,regularization = reg)
+fpca_reg = FPCA(n_components=n_cmp,regularization=reg)
 
 pc_score_reg = fpca_reg.fit_transform(fd)  #Evaluate a score for each component time-series
 fpca_reg.components_.plot()
@@ -84,7 +83,6 @@ FPCAPlot(
 ).plot()
 
 top_ft_pos = np.argmax(pc_score_reg,0)
-
 
 # Mapping direclty from FPCA to feature time-series
 pc_fpca_L2reg = np.squeeze(fpca_reg.components_.data_matrix) 

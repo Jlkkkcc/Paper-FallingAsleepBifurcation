@@ -9,11 +9,11 @@
 
 2. The cohort 2 dataset was collected by authors, and it can be made available under sufficient material transfer agreements (MTA). Please contact the authors.
 
-**Competing interests**:
+**Potential competing interests**:
 The methodology and algorithm of this manuscript are in the process of being evaluated for patent. 
 
 ## Some notices
-The code was written and working in MATLAB R2023a version and Python 3.7, with the additional functions/packages all working under this environment and tested in the Ubuntu system. If the code does not work or run on your side, check firstly your software versions (including external software not included here); Contact the authors if you have done every essential check. Please also ensure that you installed all relevant MATLAB internal toolboxes (if any).
+The code was written and working in MATLAB R2023a version and Python 3.8, with the additional functions/packages all working under this environment and tested in the Ubuntu system. If the code does not work or run on your side, check firstly your software versions (including external software not included here); Contact the authors if you have done every essential check. Please also ensure that you installed all relevant MATLAB internal toolboxes (if any).
 
 Sometimes the external software has been updated so that necessary changes are necessary to make the code running. I have tried to mark them as far as I know, however might not be comprehensive. 
 
@@ -21,8 +21,10 @@ Sometimes the external software has been updated so that necessary changes are n
 
 1. **CATCH-22**; Please download and install following their instructions [here](https://github.com/DynamicsAndNeuralSystems/catch22).
 
-   **Notes:** This package has been updated from the version we used (27 features) now to 29 features. Excluding the last two features or modify the codes if you want to include the last two features
+   **Notes:** This package has been updated from the version we used (27 features) now to 29 features. Excluding the last two features or modify the codes if you want to include the last two features. The version used in the manuscript analysis is v0.1.0.
 2. Python package for Functional principal component analysis (FPCA) [here](https://fda.readthedocs.io/en/latest/).
+
+	The package dependencies for the FPCA analysis that generated the results in the manuscript: Python 3.8, Scipy (Version 1.6.2), Scikit-fda (Version 0.7)
 
 	**Notes:** This package has been updated if you use Python 3.10 and the code given might return errors running Regularised FPCA analysis.
 
@@ -115,11 +117,11 @@ To see the results, go to the figures folder and visualise them.
 For the process codes (computation from the raw data), please refer to the documentation in "*Cohort2 Analysis*" folder: "`Cohort2 Code Description.md`"; Only the post-processing codes for generating figures are described below.
 
 ***PostProcessing***: This subfolder post-process all results generated previously for displaying in figures, as well as statistics summary, using the data from the process codes.
-	
-	* Computing the tipping points from the post-hoc bifurcation function fits for the Sleep distance dynamics from all nights (*_TippingEval\_RawS\_R2Summary.m_*)
-	* Adding post-hoc bifurcation function fit tipping point times toward the prediction results (*_AddPostHoc\_ToPrediction.m_*)
-	* Summary analysis of the prediction results of the sleep distance dynamics (compared to ground truth); The accuracy was evaluated using the cosine similarity scores; (*_Prediction\_SDynamic.m_*)
-	* Summary analysis of the tipping point prediction results (*_PredictionTipping\_Summary.m_*)
+
+* 	Computing the tipping points from the post-hoc bifurcation function fits for the Sleep distance dynamics from all nights (*_TippingEval\_RawS\_R2Summary.m_*)
+* 	Adding post-hoc bifurcation function fit tipping point times toward the prediction results (*_AddPostHoc\_ToPrediction.m_*)
+* 	Summary analysis of the prediction results of the sleep distance dynamics (compared to ground truth); The accuracy was evaluated using the cosine similarity scores; (*_Prediction\_SDynamic.m_*)
+* 	Summary analysis of the tipping point prediction results (*_PredictionTipping\_Summary.m_*)
 
 To see the results, go to the figures folder and visualise them.
 
