@@ -22,11 +22,15 @@ Sometimes the external software has been updated so that necessary changes are n
 1. **CATCH-22**; Please download and install following their instructions [here](https://github.com/DynamicsAndNeuralSystems/catch22).
 
    **Notes:** This package has been updated from the version we used (27 features) now to 29 features. Excluding the last two features or modify the codes if you want to include the last two features. The version used in the manuscript analysis is v0.1.0.
+   
+   Typical installation time: 1-minute
 2. Python package for Functional principal component analysis (FPCA) [here](https://fda.readthedocs.io/en/latest/).
 
 	The package dependencies for the FPCA analysis that generated the results in the manuscript: Python 3.8, Scipy (Version 1.6.2), Scikit-fda (Version 0.7)
 
 	**Notes:** This package has been updated if you use Python 3.10 and the code given might return errors running Regularised FPCA analysis.
+	
+	Typical installation time: 1-minute
 
 ## Basic introduction of this repository
 
@@ -48,9 +52,13 @@ Key algorithmic functions are included in the two folders inside: "Prediction Ti
 
 The two MATLAB codes show two examples (along with two ".mat" files containing the data) in using the functions.
 
-1. The "`Plot_PredExample.m`" shows one complete participant, with one training night and seven testing nights. It shows and plots the prediction of tipping points compared to the post-hoc model results;
+1. The "`Plot_PredExample.m`" shows one complete participant, with one training night and seven testing nights. It shows and plots the prediction of tipping points compared to the post-hoc model results; 
+	
+	The typical runtime for this code will be 1-3 minutes on a "normal" computer.
 
 2. The "`BifurcationFitting_Example.m`" gives an example of data for you to explore how different initial parameters could lead to different fits; It then contains the optimisation we developed.
+
+	The typical runtime for this code will be <1 minute on a "normal" computer.
 
 #### Final Plot codes & All Final Data for plots
 
@@ -63,7 +71,7 @@ In Figure3 Folder:
 3. "`SleepDistance\_Features_Plot.m`": The plots where features are plotted against the sleep distance dynamics (Figure 3C and 3F).
 4. "`GC_Plot.m`": the Granger-causality test results (Figure 3G).
 
-#### Process Codes (NoData)
+#### Process Codes (From Raw PSG data)
 
 The process codes are divided further into 3 subfolders, containing all the functions used ("*All functions*"), the analysis in the MESA dataset ("*MESA analysis*") and the analysis in cohort 2 ("*Cohort2 Analysis*"). 
 
