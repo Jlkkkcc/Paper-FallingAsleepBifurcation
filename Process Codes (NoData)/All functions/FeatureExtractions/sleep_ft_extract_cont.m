@@ -143,7 +143,7 @@ for i = 1:num_epc_unit-1
     end
 end
 
-Cxy_y_avg = nanmean(Cxy_y);
+Cxy_y_avg = nanmean(Cxy_y,1);
 
 delta_idx = (f_cohere>=delta_bd(1) & f_cohere<delta_bd(2));
 theta_idx = (f_cohere>=theta_bd(1) & f_cohere<theta_bd(2));
