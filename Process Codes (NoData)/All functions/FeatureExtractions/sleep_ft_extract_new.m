@@ -371,7 +371,6 @@ end
 % Aperiodic component from psd (1/f activity) -> using FOOOF toolbox 
 % (https://github.com/fooof-tools/fooof_mat/blob/main/README.md )
 
-
 exponent = extract_aperiodic_component(psd_y_norm, f, [min_freq, max_freq], 0, python_directory, iflinux); 
 ft.spectral_exponent = exponent;
 ft_dscrp = [ft_dscrp, 'Aperiodic component (spectral exponent)']; 
