@@ -15,10 +15,11 @@
 │   │   ├── S_variable_calculation_on_clean.asv
 │   │   └── S_variable_calculation_on_clean.m
 │   └── UnseenNightsPrediction
-│       ├── all_participants_mean_variable_script.asv
 │       ├── all_participants_mean_variable_script.m
-│       ├── fix_sleep_stats.asv
-│       └── fix_sleep_stats.m
+│       ├── fix_sleep_stats.m
+│       ├── all_participants_mean_variable_script_training_nights_changed.m
+│       ├── cosine_similarity_fixing_mistake_script.m
+│       └── review_fix_sleep_stats.m
 └── RawPSGReading
     ├── extractEEG_baseline_bedtime_so.m
     ├── extracting_full_falling_asleep_trajectory.m
@@ -44,4 +45,9 @@
 
 ### Sleep Onset Prediction on Unseen Nights 
 1) **Run `all_participants_mean_variable_script.m`.**  It requires  `ArtifactFtEEGFallingAsleep_{participantID}.mat` files with calculated true S-variables to run and outputs `WithTestNightsNumbersSummaryTable.mat` which contains predicted S-variable for different randomly selected unseen nights and different number of nights used for modelling. Also contains a cosine similarity metric to assess how close the predicted S-variable is to the true S-variable for a given night 
-2) **Run `fix_sleep_stats.m`.**  It requires `WithTestNightsNumbersSummaryTable.mat`  and outputs `uniqueTable.mat`. This file is a subset of  `WithTestNightsNumbersSummaryTable.mat` with a chosen number of nights for modelling. It contains additional columns which have data about the bifurcation fitted to the predicted S-variable, statistics about predicted critical point (predicted transition to sleep), false alarm rate as well as sleep characteristics derived from the participant's sleep staging data. 
+2) **Run `fix_sleep_stats.m`.**  It requires `WithTestNightsNumbersSummaryTable.mat`  and outputs `uniqueTable.mat`. This file is a subset of  `WithTestNightsNumbersSummaryTable.mat` with a chosen number of nights for modelling. It contains additional columns which have data about the bifurcation fitted to the predicted S-variable, statistics about predicted critical point (predicted transition to sleep), false alarm rate as well as sleep characteristics derived from the participant's sleep staging data.
+
+### Rebuttal Work with Sleep Onset Prediction on Unseen Nights 
+1) **First step of rebuttal - `all_participants_mean_variable_script_training_nights_changed.m`.**  It requires  `ArtifactFtEEGFallingAsleep_{participantID}.mat` files with calculated true S-variables to run and outputs `FinalReviewedSummaryTable.mat` which contains predicted S-variable for different randomly selected unseen nights and different number of nights used for modelling. Also contains a cosine similarity metric to assess how close the predicted S-variable is to the true S-variable for a given night. It reintroduced previously excluded participants with short sleep onsets.
+2) **Second step of rebuttal - `cosine_similarity_fixing_mistake_script.m`.**  It requires  `ArtifactFtEEGFallingAsleep_{participantID}.mat` files with calculated true S-variables to run and outputs `FinalMissingDataFixedReviewedSummaryTable.mat` which contains predicted S-variable for different randomly selected unseen nights and different number of nights used for modelling. Also contains a cosine similarity metric to assess how close the predicted S-variable is to the true S-variable for a given night. It fixed some data pipeline mistakes not addresed in the `all_participants_mean_variable_script_training_nights_changed.m`.
+3) **Run `review_fix_sleep_stats.m`.**  It requires `FinalMissingDataFixedReviewedSummaryTable.mat`  and outputs `MissingFilledFinalReviewUniqueTable.mat`. This file is a subset of  `FinalMissingDataFixedReviewedSummaryTable.mat` with a chosen number of nights for modelling. It contains additional columns which have data about the bifurcation fitted to the predicted S-variable, statistics about predicted critical point (predicted transition to sleep), false alarm rate as well as sleep characteristics derived from the participant's sleep staging data.
