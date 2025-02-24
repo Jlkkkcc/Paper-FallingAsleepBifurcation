@@ -20,7 +20,7 @@ load FPCADynamics.mat
 
 % Refer to description (ft_dscrp) to match feature indexes with names for
 % other features
-ctr_ft = 15;
+ctr_ft = 17;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 tvec = -(max_ck_real-1)/20:0.05:10.5;
@@ -56,8 +56,10 @@ colormap(gg)
 ylim([0,5])
 yticks([0:5])
 
-xlim([-0.4,1.6])
-xticks([-0.4:0.4:1.6])
+% xlim([-0.4,1.6])
+% xticks([-0.4:0.4:1.6])
+
+xlim([-0.2,0.8])
 
 % clabel('Time (min)')
 

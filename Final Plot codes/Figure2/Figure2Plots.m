@@ -427,29 +427,32 @@ f.Position(3:4) = [500,600];
 
 tonset = find(tvec==0);
 
-ax1=subplot(3,1,1);
+ax1=subplot(3,1,3);
 plot(tvec,hyp_expand,'LineWidth',2)
 ylim([0,3])
 box off
-set(gca,'FontSize', 12)
+set(gca,'FontSize', 16)
 set(gca,'TickDir','out')
 set(gca,'ticklength',2*get(gca,'ticklength'))
 set(gca,'lineWidth',2)
 set(gca, 'YTick', 0:3, 'YTickLabel', stageNames);
+xlabel('Time (min)')
 line([0,0],ax1.YLim,'LineStyle','--','LineWidth',2,'Color','r');
 
-ax2=subplot(3,1,2:3);
+ax2=subplot(3,1,1:2);
 plot(tvec,s_dynam,'k')
 hold on
 plot(tvec,sfit,'b','LineWidth',3)
 box off
-set(gca,'FontSize', 12)
+set(gca,'FontSize', 16)
 set(gca,'TickDir','out')
 set(gca,'ticklength',2*get(gca,'ticklength'))
 set(gca,'lineWidth',2)
 ylabel('s')
-xlabel('Time (min)')
+
 line([0,0],ax2.YLim,'LineStyle','--','LineWidth',2,'Color','r');
+% Tipping point
+scatter(t_crtc,sfit(find(tvec==t_crtc),1),80,'filled','MarkerFaceColor','r')
 
 
 %% Figure 2I
@@ -469,7 +472,7 @@ histogram(r2all_new,edgesbin)
 hold on
 plot(pdfbin,ypdf*(0.05*length(r2all_new)),'LineWidth',2,'Color','r')
 box off
-set(gca,'FontSize', 12)
+set(gca,'FontSize', 16)
 set(gca,'TickDir','out')
 set(gca,'ticklength',2*get(gca,'ticklength'))
 set(gca,'lineWidth',2)

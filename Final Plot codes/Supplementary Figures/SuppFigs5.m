@@ -139,7 +139,7 @@ iddst = max_ck_real-1200;
 shadedErrorBar(max_ck_real-max_ck_real11+1:max_ck_real+epc_postasleep+1,distall_avg11(time_start_sampenough11:end)-minall,distall_ste11(time_start_sampenough11:end),'lineProps',{'-b','lineWidth',2,'Color',[0,0,1,0.2]})
 
 xticks([iddst:100:max_ck_real+epc_postasleep+1])
-xticklabels([-60:5:10.5])
+xticklabels([-60:10:10.5])
 
 
 yl = ylim;
@@ -187,8 +187,8 @@ for iii = time_start_sampenough11:max_epctotal
     end
 end
 
-xticks([iddst:100:max_ck_real+epc_postasleep+1])
-xticklabels([-60:5:10.5])
+xticks([iddst:200:max_ck_real+epc_postasleep+1])
+xticklabels([-60:10:10.5])
 
 
 

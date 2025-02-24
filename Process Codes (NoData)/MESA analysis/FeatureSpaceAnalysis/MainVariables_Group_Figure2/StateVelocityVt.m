@@ -133,7 +133,7 @@ distall_ste_diff = std(distdiff_allsbjs_mat_boot,[],1,'omitnan')./sqrt(numsamp_t
 
 time_start_sampenough = find(numsamp_tt>=N_samp_min,1);
 max_ck_real = length(distall_avg_diff) - time_start_sampenough - epc_postasleep;
-tvec = -(max_ck_real-1)/20:0.05:10;
+tvec = -(max_ck_real-1)/20:0.05:10.5;
 
 base_pertest = 10*60;      % Window as baseline to test difference;
 tail = 'both';       % Testing for decreasing

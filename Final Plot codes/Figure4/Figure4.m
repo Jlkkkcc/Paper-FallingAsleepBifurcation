@@ -137,7 +137,7 @@ figure
 binedges = [-20:0.5:0];
 % histogram(predany_all(idxmask),binedges,'Normalization','probability')
 % hold on
-histogram(tcrtc_alltrains_vec(idxposmdl),binedges,'Normalization','probability')
+histogram(tcrtc_alltrains_vec(idxallinc),binedges,'Normalization','probability')
 xlabel('Time (min)')
 ylabel('Probability')
 box off
@@ -145,6 +145,8 @@ set(gca,'FontSize', 12)
 set(gca,'TickDir','out')
 set(gca,'ticklength',2*get(gca,'ticklength'))
 set(gca,'lineWidth',2)
+tdmed = median(tcrtc_alltrains_vec(idxallinc),'omitnan');
+line([tdmed,tdmed],ylim,'LineStyle','--','LineWidth',2,'Color','r');
 
 tdiff = predany_all(idxallinc) - tcrtc_alltrains_vec(idxallinc);
 figure

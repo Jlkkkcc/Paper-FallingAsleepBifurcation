@@ -23,6 +23,7 @@ max_ews_len = length(ews_out_all{sbjsamp}.(ft_to_avg).(ews_to_avg));           %
 kk = 0;
 N_valid = size(T_pval,1);
 allewsts = NaN(N_valid,max_ews_len);
+end_tocut = 199-10;
 
 t_sleep = epcs_to_asleep(sbjsamp)*score_size;
 t = ((stp_ftepcs_all_filt{sbjsamp}-1)/Fs) - t_sleep;
@@ -54,7 +55,7 @@ for sbj = 1:length(ews_out_all)
         
         allewsts(kk,max_ews_len-len_ewsnow+1:end) = ews_tsnow;
 
-        for jjj = 1:len_ewsnow
+        for jjj = 1:len_ewsnow-end_tocut
             cnt = cnt+1;
             allews(cnt) = ews_tsnow(jjj);
             allsbjid(cnt) = sbj;
@@ -122,7 +123,7 @@ for sbj = 1:length(ews_out_all)
         
         allewsts(kk,max_ews_len-len_ewsnow+1:end) = ews_tsnow;
 
-        for jjj = 1:len_ewsnow
+        for jjj = 1:len_ewsnow-end_tocut
             cnt = cnt+1;
             allews(cnt) = ews_tsnow(jjj);
             allsbjid(cnt) = sbj;

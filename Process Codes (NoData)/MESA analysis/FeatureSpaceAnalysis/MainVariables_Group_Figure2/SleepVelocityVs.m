@@ -126,7 +126,7 @@ end
 % Bootstrapping
 % Previous lables cannot be used; So shuffling myself
 
-max_epctotal = size(amp_allsbjs_mat,2) - runwin;
+max_epctotal = size(dotp_allsbjs_mat,2) - runwin;
 numsamps_eachtime = sum((1-isnan(dotp_allsbjs_mat)),1);
 idx_enou_samp = find(numsamps_eachtime>=N_min,1);
 disp('Time to sleep onset in minutes:')
@@ -156,7 +156,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Check sample numbers
-numsamp_tt = sum((1-isnan(theta_allsbjs_mat_bootstrap)),1);
+numsamp_tt = sum((1-isnan(dotp_allsbjs_mat_bootstrap)),1);
 
 % distall_avg = mean(dist_allsbjs_mat_bootstrap,1,'omitnan');
 % distall_ste = std(dist_allsbjs_mat_bootstrap,[],1,'omitnan')./sqrt(numsamp_tt-1);
