@@ -60,6 +60,7 @@ rsq = rsquare(xx_smooth,dd(:,1))
 
 % You can set the warnings to off, because the ODE solvers will excede
 % tolerances very often.
+warning off
 
 % First-step tuning, tune the K values
 % If you do not input the initial parameters, the function will have a

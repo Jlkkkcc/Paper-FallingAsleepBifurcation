@@ -34,7 +34,7 @@ clear all
 clc
 
 load PredictionExample.mat
-load Figure4D1.mat
+load Figure4di.mat
 
 
 %% Plotting training nights and prediction nights as a whole
