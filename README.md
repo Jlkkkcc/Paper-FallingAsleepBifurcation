@@ -97,7 +97,7 @@ There are a few externally developed packages in MATLAB (which do not require in
 * [ShadedErrorBar](https://uk.mathworks.com/matlabcentral/fileexchange/26311-raacampbell-shadederrorbar)
 * [ViolinPlot](https://github.com/bastibe/Violinplot-Matlab)
 * [DistinguishableColors](https://www.mathworks.com/matlabcentral/fileexchange/29702-generate-maximally-perceptually-distinct-colors#functions_tab)
-* For PSG (EDF format) [Reading](https://www.edfplus.info/downloads/index.html)
+* [For PSG (EDF format) Reading](https://www.edfplus.info/downloads/index.html)
 * Circular statistics toolbox [CircStat](https://uk.mathworks.com/matlabcentral/fileexchange/10676-circular-statistics-toolbox-directional-statistics)
 
 The other subfolders within contain our self-developed in-house algorithms and codes for the relevant analysis required.
@@ -136,7 +136,7 @@ The analysis scripts are introduced in a sequential order below:
 
 	5. *BifAnalysis\_IndividualFeatures\_Rev*: This folder contains analysis codes for revision supplements, where the bifurcation dynamics were tested on individual features (the nine FPC1 representative features). The code *_`Individual_BifFitting_perftLoop.m`_* prepares the feature time series for bifurcation fitting, and *_`TSPrep_IndivFt_IndivSbj_Loopfts.m`_* runs the bifurcation fitting and saves the results.
 
-To see the figure results, go to the figures folder and visualise them.
+To see the figure results, go to the figures folder and visualise them. Note that the many trivial analysis codes (such as the summary of certain statistics like mean or standard deviations, or quick test of correlations, as reported in the manuscript) are not all included; the codes here are aiming to cover the main results and key methodologies used.
 
 
 -----
@@ -146,12 +146,12 @@ For the process codes (computation from the raw data), please refer to the docum
 
 ***PostProcessing***: This subfolder post-processes all results generated previously for displaying in figures, as well as a statistics summary, using the data from the process codes.
 
-* 	Computing the tipping points from the post-hoc bifurcation function fits for the Sleep distance dynamics from all nights (*_TippingEval\_RawS\_R2Summary.m_*)
-* 	Adding post-hoc bifurcation function fit tipping point times toward the prediction results (*_AddPostHoc\_ToPrediction.m_*)
-* 	Summary analysis of the prediction results of the sleep distance dynamics (compared to ground truth); The accuracy was evaluated using the cosine similarity scores; (*_Prediction\_SDynamic.m_*)
-* 	Summary analysis of the tipping point prediction results (*_PredictionTipping\_Summary.m_*)
+* 	Computing the tipping points from the post-hoc bifurcation function fits for the Sleep distance dynamics from all nights (*_`TippingEval_RawS_R2Summary.m`_*)
+* 	Adding post-hoc bifurcation function fit tipping point times toward the prediction results (*_`AddPostHoc_ToPrediction.m`_*)
+* 	Summary analysis of the prediction results of the sleep distance dynamics (compared to ground truth); The accuracy was evaluated using the cosine similarity scores; (*_`Prediction_SDynamic.m`_*)
+* 	Summary analysis of the tipping point prediction results (*_`PredictionTipping_Summary.m`_*)
 
-To see the results, go to the figures folder and visualise them.
+To see the analysis results, go to the figures folder and visualise them.
 
 	
 
