@@ -9,9 +9,18 @@ clear all
 clc
 load FittingStatsTable_AllParticipants_New.mat
 
-% Clean up exclusions
-tblnew = fittingStatsTable;
-tblnew([252:259,279,281,283,284],:) = [];   % Exclusion
+tblnew = fittingStatsTable_new;
+
+% Participant correction - Mistaken nights from restriction
+
+% af0318: ID 104
+% af0399: ID 163
+% af0378: ID 140 141
+% af0409: ID 174 175 176 282
+% af0469: ID 234
+% af0496: ID 250
+
+tblnew([279,281,283,284,104,163,140,141,174,175,176,282,234,250],:) = [];   % Exclusion
 
 fittingStatsTable = tblnew;
 
@@ -79,10 +88,10 @@ latall = fittingStatsTable_new.Time2Sleep;
 
 TC_Mdl = fittingStatsTable_new.Model_CrticT;
 
-mask_lat = (latall>=10 & latall<=90);
+mask_lat = (latall>=3 & latall<=90);
 sum(TC_Mdl(mask_lat)>=0)
 
-mask_all = (latall>=10 & latall<=90) & (TC_Mdl<0);
+mask_all = (latall>=3 & latall<=90) & (TC_Mdl<0);
 
 figure
 edgesbin = [0:0.05:1];

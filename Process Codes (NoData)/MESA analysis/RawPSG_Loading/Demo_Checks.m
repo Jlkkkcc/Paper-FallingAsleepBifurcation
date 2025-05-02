@@ -24,6 +24,7 @@ time_to_sleep_all_correct = [];
 diff_list_all = [];
 
 sleep_info_correct_all = [];
+epcs_exc_1 = [];
 
 for i = 1:num_parts
     load(['Subject_info_part_',num2str(i),'.mat'])
@@ -34,12 +35,15 @@ for i = 1:num_parts
     % Additional info
     diff_list_all = [diff_list_all,diff_list + (i-1)*n_part];
     time_to_sleep_all_correct = [time_to_sleep_all_correct;time_to_sleep_correct];
+
+    epcs_exc_1 = [epcs_exc_1;sleep_info(:,1)];
     
     sleep_info_correct_all = [sleep_info_correct_all;sleep_info_oriscore_nonan];
 
 end
 discard_info_sum = sum(discard_info_all,2);
-
+  % This saves the length of the initial period cut (initial artefactual periods for each participant)
+save('epcsexc.mat','epcs_exc_1')  
 
 %% Sleep onset time distribution and divisions
 

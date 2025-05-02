@@ -1,4 +1,4 @@
-%% Bifurcation diagram - Sleep distance s(t) versus the feature dynamics (Figures 3C and 3F)
+%% Bifurcation diagram - Sleep distance s(t) versus the feature dynamics (Figures 3c and 3f)
 
 % Author: JL
 
@@ -7,7 +7,7 @@
 clear all
 clc
 
-load Figure2A.mat
+load Figure2a.mat
 load FPCADynamics.mat
 
 %% Bifurcation diagram against all types of control parameters as features

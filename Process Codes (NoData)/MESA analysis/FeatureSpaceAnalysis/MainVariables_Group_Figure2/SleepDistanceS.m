@@ -14,9 +14,8 @@ load GrpFt_MeanStd.mat
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Control parameters for how many features to use and how long time
 % post-asleep to average on
-ft_use = 1:47;             % Features used to evaluate distance
-% ft_use = [10,11,15,41];
-% ft_use = [13,15,45,41];
+ft_use = 1:50;             % Features used to evaluate distance  % Before revision, 47 features
+
 num_ft = length(ft_use);
 
 epc_postasleep = floor((10.5*60-epc_len)/jmp_len)+1;
@@ -132,7 +131,7 @@ save('SleepDistance_Grp.mat')
 
 %%
 
-save('Figure2D.mat','distall_avg')
+save('Figure2d.mat','distall_avg')
 
 
 

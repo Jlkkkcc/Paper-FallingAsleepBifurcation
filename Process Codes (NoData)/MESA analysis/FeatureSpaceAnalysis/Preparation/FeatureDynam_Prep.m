@@ -151,7 +151,7 @@ end
 
 %% Feature dynamics plot
 
-num_ft = 47;
+num_ft = 50;    % Before revision, 47 features
 max_epctotal = max(totalepc_sbj);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -240,7 +240,7 @@ for nft = 1:num_ft
                 continue
             end
             ftnow = ft_sbj{nsbj}.ck{oridxft(jj)}.ft_ch(:,nft);    % The current feature values
-            ftnow (ftnow(:,1) == 0,:) = NaN;
+            % ftnow (ftnow(:,1) == 0,:) = NaN;
             ftmat_this(nsbj,jj) = mean(ftnow,'omitnan');       % Average features across channels
 
         end

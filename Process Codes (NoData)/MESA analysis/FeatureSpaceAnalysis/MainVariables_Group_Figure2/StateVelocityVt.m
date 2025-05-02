@@ -14,9 +14,8 @@ load GrpFt_MeanStd.mat
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Control parameters for how many features to use and how long time
 % post-asleep to average on
-ft_use = 1:47;             % Features used to evaluate distance
-% ft_use = [10,11,15,41];
-% ft_use = [13,15,45,41];
+ft_use = 1:50;             % Features used to evaluate distance
+
 num_ft = length(ft_use);
 N_samp_min = 200;
 
@@ -149,7 +148,7 @@ distall_avg_smooth = smoothdata(distall_avg,2,'movmedian',20);
 
 %% Save for plots
 
-save('Figure2B.mat','epc_len','jmp_len','max_ck_real','tvec','distall_avg_smooth','time_start_sampenough','distall_ste','pvec_dist','basetest_epc')
+save('Figure2b.mat','epc_len','jmp_len','max_ck_real','tvec','distall_avg_smooth','time_start_sampenough','distall_ste','pvec_dist','basetest_epc')
 
 
 

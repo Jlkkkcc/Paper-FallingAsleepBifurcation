@@ -15,9 +15,8 @@ load GrpFt_MeanStd.mat
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Control parameters for how many features to use and how long time
 % post-asleep to average on
-ft_use = 1:47;             % Features used to evaluate distance
-% ft_use = [10,11,15,41];
-% ft_use = [13,15,45,41];
+ft_use = 1:50;             % Features used to evaluate distance
+
 num_ft = length(ft_use);
 
 max_epctotal = max(totalepc_sbj);
@@ -181,7 +180,7 @@ p_th = 0.025 /(length(pvec_dist)-20);
 
 %% Save for plots
 
-save('Figure2C.mat','epc_len','jmp_len','max_ck_real','tvec','dotp_avg','dotp_ste','time_start_sampenough','pvec_dist','basetest_epc')
+save('Figure2c.mat','epc_len','jmp_len','max_ck_real','tvec','dotp_avg','dotp_ste','time_start_sampenough','pvec_dist','basetest_epc')
 
 
 

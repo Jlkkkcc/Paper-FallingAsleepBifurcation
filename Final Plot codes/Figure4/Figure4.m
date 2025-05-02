@@ -2,17 +2,16 @@
 
 % Author: JL
 
-%% Figure 4B
+%% Figure 4b
 
 clear all
 clc
-load Figure4B.mat
+load Figure4b.mat
 
 figure
 hold on
 plot(tvec,nis_smooth,'LineWidth',2,'Color','r')
 plot(tvec,raws,'LineWidth',2,'Color','k')
-legend({'pred','raw'})
 xlabel('Time (min)')
 ylabel('Sleep distance')
 box off
@@ -20,13 +19,16 @@ set(gca, 'FontSize', 12);
     set(gca, 'TickDir', 'out');
     set(gca, 'ticklength', 2*get(gca, 'ticklength'));
     set(gca, 'lineWidth', 2);
+yl = ylim;
+line([0,0],yl,'LineStyle','--','LineWidth',2,'Color','r')
 
+legend({'pred','raw'})
 
-%% Figure 4C
+%% Figure 4c
 
 clear all
 clc
-load Figure4C.mat
+load Figure4c.mat
 
 colorsall = distinguishable_colors(10);
 colorsall = colorsall([2,1,4,5,6,9,8],:);
@@ -49,11 +51,11 @@ set(gca,'lineWidth',2)
 
 clear all
 clc
-load Figure4D1.mat
+load Figure4di.mat
 
 [SCrtic, ~]  = plot_bifurcation_rev(dd, xx_smooth, tvec, 'Noname', params_optim, 1);
 
-%% Figure 4D (iii), Representative testing night for prediction
+%% Figure 4d (iii), Representative testing night for prediction
 
 % This plot only shows one out of 7 testing night of that participant
 % For a more comprehensive view of all testing nights example, see the
@@ -64,7 +66,7 @@ load Figure4D1.mat
 
 clear all
 clc
-load Figure4D2.mat
+load Figure4diii.mat
 
 stageNames = {'Awake', 'N1', 'N2', 'N3'};
 f = figure;
@@ -123,15 +125,14 @@ if ~isempty(crossingTimePoints)
 end
 line([0,0],ax2.YLim,'LineStyle','--','LineWidth',2,'Color','r');
 
-
 tcrnow = mdltcrt(night_to_plot);
-line([tcrnow,tcrnow],ax2.YLim,'LineStyle','--','LineWidth',2,'Color','b');
+plot([tcrnow,tcrnow],xx_smoothed(find(tvec==tcrnow)),'bo', 'MarkerSize', 8, 'MarkerFaceColor', 'b');
 
-%% Figure 4E
+%% Figure 4e
 
 clear all
 clc
-load Figure4E.mat
+load Figure4e.mat
 
 figure
 binedges = [-20:0.5:0];

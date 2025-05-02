@@ -1,6 +1,6 @@
 
 
-%% Plot individual features (Figure 3B and 3E)
+%% Plot individual features (Figure 3b and 3e)
 
 clear all
 clc

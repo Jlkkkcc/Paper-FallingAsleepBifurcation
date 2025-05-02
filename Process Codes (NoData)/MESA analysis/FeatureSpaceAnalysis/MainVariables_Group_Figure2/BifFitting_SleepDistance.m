@@ -176,7 +176,7 @@ disp(['Best New metric: ',num2str(find(newmet == max(newmet)))])
 
 %% Save for plots
 
-save('Figure2A.mat','epcs_tofit','distall_ste','tvec_now','dd','basetest_epc','idxstartfit','pvec_dist','params_optim','time_start_sampenough','xx_smooth','t_critc','c_critc',"c_3sol",'xx')
+save('Figure2a.mat','epcs_tofit','distall_ste','tvec_now','dd','basetest_epc','idxstartfit','pvec_dist','params_optim','time_start_sampenough','xx_smooth','t_critc','c_critc',"c_3sol",'xx')
 
 
 

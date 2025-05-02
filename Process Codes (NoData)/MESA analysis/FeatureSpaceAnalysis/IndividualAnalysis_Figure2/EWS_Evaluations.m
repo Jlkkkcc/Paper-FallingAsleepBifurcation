@@ -179,7 +179,7 @@ end
 avg_score_cutews = avg_score(:,end-length(tews)+1:end);
 pvec_slp = tvtest(avg_score_cutews,base_epcs,'left');
 
-save('Figure2F.mat',"pvec_slp",'tews','avg_score','ews_all',"pvec_ews",'base_epcs','kk')
+save('Figure2f.mat',"pvec_slp",'tews','avg_score','ews_all',"pvec_ews",'base_epcs','kk')
 
 
 

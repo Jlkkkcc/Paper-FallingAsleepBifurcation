@@ -5,11 +5,11 @@
 % Data were processed and analysed in MESA analysis folder; Only final data
 % are shown and included here for plotting with no process data.
 
-%% Figure 2A
+%% Figure 2a
 
 clear all
 clc
-load Figure2A.mat
+load Figure2a.mat
 
 p_th = 0.025 / length(pvec_dist);
 onsetmark = epcs_tofit;
@@ -47,11 +47,11 @@ end
 scatter(t_critc,dd(find(tvec_now==t_critc),1),80,'filled','MarkerFaceColor','r')
 
 
-%% Figure 2B
+%% Figure 2b
 
 clear all
 clc
-load Figure2B.mat
+load Figure2b.mat
 
 timeplot = 60*60;
 epcs_toplot = floor((timeplot-epc_len)/jmp_len)+1;
@@ -97,11 +97,11 @@ for iii = 1:length(pvec_dist)
 end
 
 
-%% Figure 2C
+%% Figure 2c
 
 clear all
 clc
-load Figure2C.mat
+load Figure2c.mat
 
 distall_avg_smooth = smoothdata(dotp_avg,"movmean",20);
 p_th = 0.025 /(length(pvec_dist)-20);
@@ -136,17 +136,17 @@ for iii = 1:length(pvec_dist)
     end
 end
 
-%% Figure 2D
+%% Figure 2d
 % This figure uses data from previous
 
 clear all
 clc
-load Figure2C.mat
+load Figure2c.mat
 
 tvec = -(max_ck_real-1)/20:0.05:10.5;
 dotp_all = smoothdata(dotp_avg,"movmean",10);
 
-load Figure2D.mat
+load Figure2d.mat
 % distall_avg1 = distall_avg - min(distall_avg);
 distsmooth = smoothdata(distall_avg,2,'movmean',5);
 distsmooth = distsmooth -min(distsmooth);
@@ -163,7 +163,7 @@ set(gca,'lineWidth',2)
 xlabel('s')
 ylabel('E (Potential)')
 
-%% Figure 2E
+%% Figure 2e
 
 % To plot the theoretical bifurcation diagram, the solutions of the
 % differential equations are required; 
@@ -172,7 +172,7 @@ ylabel('E (Potential)')
 
 clear all
 clc
-load Figure2A.mat
+load Figure2a.mat
 
 syms x
 param_min = params_optim;
@@ -270,11 +270,11 @@ set(gca,'ticklength',2*get(gca,'ticklength'))
 set(gca,'lineWidth',2)
 line([c_critc,c_critc],ylim,'LineStyle','--','LineWidth',2,'Color','r')
 
-%% Figure 2F
+%% Figure 2f
 
 clear all
 clc
-load Figure2F.mat
+load Figure2f.mat
 
 p_th = 0.025 / length(pvec_slp);         % Bonferroni correction
 % p_th = 0.025;
@@ -392,35 +392,12 @@ yl = ylim;
 yl = [1.2,1.8];
 line([tews_plt(onsetmark),tews_plt(onsetmark)],yl,'LineStyle','--','LineWidth',2,'Color','r')
 
-%% Figure 2G
+
+%% Figure 2g
 
 clear all
 clc
-load Figure2G.mat
-
-figure
-scatter(depth_pos,r2all,20,'filled')
-p = polyfit(depth_pos,r2all,1);
-hold on
-xl = xlim;
-dx = diff(xl)/100;
-xvec = xl(1):dx:xl(2);
-plot(xvec,xvec*p(1)+p(2),'r','LineWidth',2)
-box off
-set(gca,'FontSize', 12)
-set(gca,'TickDir','out')
-set(gca,'ticklength',2*get(gca,'ticklength'))
-set(gca,'lineWidth',2)
-xlabel('Avg. Sleep score')
-ylabel('Fitting accuracy (R2)')
-ylim([-1.5,1])
-yticks([-1.5:0.5:1])
-
-%% Figure 2H
-
-clear all
-clc
-load Figure2H.mat
+load Figure2g.mat
 
 f = figure;
 f.Position(3:4) = [500,600];
@@ -455,11 +432,11 @@ line([0,0],ax2.YLim,'LineStyle','--','LineWidth',2,'Color','r');
 scatter(t_crtc,sfit(find(tvec==t_crtc),1),80,'filled','MarkerFaceColor','r')
 
 
-%% Figure 2I
+%% Figure 2h
 
 clear all
 clc
-load Figure2I.mat
+load Figure2h.mat
 
 figure
 edgesbin = [0:0.05:1];
@@ -482,7 +459,30 @@ xlim([0,1])
 r2med = median(r2all_new);
 line([r2med,r2med],ylim,'LineStyle','--','LineWidth',2,'Color','r');
 
+%% Figure 2i
 
+clear all
+clc
+load Figure2i.mat
+
+
+figure
+scatter(K_all_clean,t_crtic_clean,20,'filled')
+p = polyfit(K_all_clean,t_crtic_clean,1);
+hold on
+xl = xlim;
+dx = diff(xl)/100;
+xvec = xl(1):dx:xl(2);
+plot(xvec,xvec*p(1)+p(2),'r','LineWidth',2)
+box off
+set(gca,'FontSize', 16)
+set(gca,'TickDir','out')
+set(gca,'ticklength',2*get(gca,'ticklength'))
+set(gca,'lineWidth',2)
+xlabel('Maximum Distance')
+ylabel('Tipping point (Relative to Onset)')
+ylim([-20,10])
+xlim([0,15])
 
 
 

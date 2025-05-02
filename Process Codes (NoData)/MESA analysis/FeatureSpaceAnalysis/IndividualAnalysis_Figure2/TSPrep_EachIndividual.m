@@ -89,7 +89,7 @@ end
 
 N_cont_art = 180;         % Maximum minutes length of continuous artefacts in second
 max_artper = 0.5;           % Maximum percentage of artefacts
-per_min = 10*60 / score_size;       % Minimum length of falling asleep period for EWS analysis
+per_min = 3*60 / score_size;       % Minimum length of falling asleep period for EWS analysis
 post_pernum = 21;     % Epochs of post-asleep (in scoring sizes)
 
 time_ews = 30*60;    % Last N minutes for artefact filtering
@@ -173,8 +173,7 @@ end
 
 %% Distance time-series construction revised
 
-ft_list = [1:47];
-% ft_list = [13,15,45,41];    % FPCA features
+ft_list = [1:50];
 
 % Post-asleep time can be modified
 % onset_per = 60;
