@@ -45,7 +45,6 @@ numFeatures = 47;
 
 windowSize = 10; % smooth over 30 seconds
 
-%SelectedChannels = {'F4_A1', 'C4_A1', 'P4_A1', 'O2_A1', 'LOC_A2', 'ROC_A1', 'F3_A2', 'C3_A2', 'P3_A2', 'O1_A2'};
 SelectedChannels = {'F4_A1', 'C4_A1', 'P4_A1', 'O2_A1', 'F3_A2', 'C3_A2', 'P3_A2', 'O1_A2'};
 
 sleepOnsetDuration = 60; %in seconds 

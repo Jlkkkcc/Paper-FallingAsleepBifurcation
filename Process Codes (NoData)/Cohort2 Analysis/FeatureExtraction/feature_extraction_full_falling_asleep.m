@@ -41,10 +41,10 @@ python_directory = ''; % Your Python directory
 iflinux = true; % Your operating system flag
 
 % Initialize tables to store features for each epoch of each channel
-numFeatures = 49;
+numFeatures = 47;
 
 
-SelectedChannels = {'F4_A1', 'C4_A1', 'P4_A1', 'O2_A1', 'LOC_A2', 'ROC_A1', 'F3_A2', 'C3_A2', 'P3_A2', 'O1_A2'};
+SelectedChannels = {'F4_A1', 'C4_A1', 'P4_A1', 'O2_A1', 'F3_A2', 'C3_A2', 'P3_A2', 'O1_A2'};
 
 % Loop through the participant folders to extract the data from the hypnograms 
 for i = 1:length(participantNames)
@@ -122,9 +122,9 @@ for i = 1:length(participantNames)
 
             
                 if any(continuousZerosMask) || any(flatlinedMask)
-                    participantSubset.FallingAsleepFeatures{n}{j, ch} = {NaN(49,1)};
+                    participantSubset.FallingAsleepFeatures{n}{j, ch} = {NaN(47,1)};
                 else
-                    [ft, ft_dscrp] = sleep_ft_extract_new(channelData, Fs, python_directory, iflinux);
+                    [ft, ft_dscrp] = sleep_ft_extract_cont(channelData, Fs);
                     % Store the features in the corresponding table
                     participantSubset.FallingAsleepFeatures{n}{j, ch} = {cell2mat(struct2cell(ft))};
                 end
