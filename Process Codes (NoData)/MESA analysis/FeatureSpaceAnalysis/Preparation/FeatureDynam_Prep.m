@@ -10,7 +10,7 @@
 %% Data loading
 clear all
 clc
-load 'fteval_EWSallsbj_20Dec.mat'
+load 'fteval_allsbj.mat'
 
 %% Artefact check based on shorter epochs and EEG extracted;
 %

@@ -9,7 +9,7 @@
 
 clear all
 clc
-load fteval_EWSallsbj_20Dec.mat
+load 'fteval_allsbj.mat'
 load GrpFt_MeanStd.mat
 
 %% Parameters and pre-processing of state variable time-series

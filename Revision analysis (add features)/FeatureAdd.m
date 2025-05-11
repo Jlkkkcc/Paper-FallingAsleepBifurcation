@@ -7,7 +7,7 @@
 clear all
 clc
 
-load fteval_EWSallsbj_20Dec.mat
+load 'fteval_allsbj.mat'   % Load previous feature mat
 
 %% Add features to original structure data
 
@@ -25,7 +25,7 @@ rm_data = epc_len_data-ovlap_data;
 channel_mkr = NaN(num_sbjs,num_chs);
 ft_sbj_patch = ft_sbj;   % Directly patch in new features
 ft_sbj_new = [];     % Store only new features
-num_newft = 8;
+num_newft = 3;
 num_ftori = 47;
 
 save_num = 100;
@@ -146,7 +146,9 @@ for i = 1:num_sbjs
     end
 end
 
-
+%%
+% Save to new mat; The new data is used for revision (notice the names in
+% other codes, remember to change the names to load this data with added features if needed.
 save('fteval_allsbj_26Dec24_all.mat','-v7.3')
 clear eeg_asleepper_all eeg_this
 save('fteval_allsbj_26Dec24_light.mat','-v7.3')

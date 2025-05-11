@@ -7,7 +7,7 @@
 
 clear all
 clc
-load 'fteval_EWSallsbj_20Dec.mat'
+load 'fteval_allsbj.mat'
 
 %% Parameters and pre-processing of state variable time-series
 % 03/02/2022

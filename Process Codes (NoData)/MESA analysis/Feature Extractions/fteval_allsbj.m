@@ -161,7 +161,7 @@ for i = 1:num_sbjs
 end
 
 clear data_all_mesa
-save('fteval_EWSallsbj_20Dec.mat')
+save('fteval_allsbj.mat')
 
 
 

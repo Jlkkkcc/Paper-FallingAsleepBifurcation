@@ -26,9 +26,9 @@ Sometimes the external software has been updated, so necessary changes are neces
 
 1. **CATCH-22**; Please download and install following their instructions to compile the C codes in MATLAB [here](https://github.com/DynamicsAndNeuralSystems/catch22).
 
-   **Notes:** This package has been updated from the version we used (27 features) to 29 features. Excluding the last two features, or modify the codes if you want to include the last two features. The version used in the manuscript analysis is v0.1.0.
+   **Notes:** This package has been updated from the version we used (27 features) to 29 features. Excluding the last two features, or modify the codes if you want to include the last two features. The version used in the manuscript analysis is v0.1.0. Please also note, _this toolbox update might result in quantitative differences in the feature output (compared to the manuscript results)_, but should not affect bifurcation dynamic findings.
    
-   Typical installation time: 1-minute
+   Typical installation time: 1-2 minutes
 2. Python package for Functional principal component analysis (FPCA) [here](https://fda.readthedocs.io/en/latest/).
 
 	The package dependencies for the FPCA analysis that generated the results in the manuscript: Python 3.8, Scipy (Version 1.6.2), Scikit-fda (Version 0.7)
@@ -52,7 +52,7 @@ Sometimes the external software has been updated, so necessary changes are neces
 
 Before you start to run analyses or plotting, make sure that you add the entire folder to the path in MATLAB. The repository contains four folders:
 
-1. "*Core Algorithms and Examples*": This folder contains the two core algorithms in this paper: the bifurcation function fitting and the prediction of the tipping point. The folder also includes some example data for exploration on your own.
+1. "*Core Algorithms and Examples*": This folder contains the two core algorithms in this paper: feature and sleep distance evaluation, the bifurcation function fitting, and the prediction of the tipping point. The folder also includes some example data for exploration on your own.
 
 2. "*Process Codes (NoData)*": This folder contains the process codes to read, process, and analyse the raw sleep data. The raw sleep data should be obtained as specified previously, no data has been given here.
 
@@ -66,17 +66,28 @@ Before you start to run analyses or plotting, make sure that you add the entire 
 
 #### Core Algorithms and Examples
 
-Key algorithmic functions are included in the two folders inside: "Prediction Tipping Point" and "Bifurcation Function Fitting".
+The folder provides three examples of core algorithms, organised in separate folders. Before running the code, remember to install the relevant toolboxes and add the entire repository to the directory.
 
-The two MATLAB codes show two examples (along with two ".mat" files containing the data) in using the functions.
+1. Feature extraction and sleep distance calculation in folder '_Feature and Sleep distance computation_'.
 
-1. The "`Plot_PredExample.m`" shows one complete participant, with one training night and seven testing nights. It shows and plots the prediction of tipping points compared to the post-hoc model results; 
+	The "`Feature_SDist_Eval.m`" provides an exemplary code to extract EEG features from EEG epochs (6 s) for the falling asleep process (cut from 30 minutes before sleep onset to 10 minutes after), and the evaluation of the sleep distance metric. This same sleep distance time series is used for the bifurcation fitting example (see next).
 	
-	The typical runtime for this code will be 1-3 minutes on a "normal" computer.
+	***Important notice:*** This code is not a replication of the full computational pipeline but only the key computational aspects above. The other processing steps (e.g., artefact removal) are not included in this example; the EEG data provided has already been processed, and we here only included one EEG channel to shorten the runtime. Please do follow standard guidelines and your own demands to pre-process your EEG data before the feature extraction step.
 
-2. The "`BifurcationFitting_Example.m`" gives an example of data for you to explore how different initial parameters could lead to different fits; It then contains the optimisation we developed.
+	The typical runtime for this code will be *~10 minutes* on a "normal" computer. Notice that the feature extraction is very time-consuming, therefore, we also included the pre-evaluated features for evaluation of sleep distance (*<1 minute*).
 
-	The typical runtime for this code will be <1 minute on a "normal" computer.
+2. Bifurcation fitting examples in folder '_Examples Bif Fitting_'. 
+
+	The "`BifurcationFitting_Example.m`" gives an example of data for you to explore how different initial parameters could lead to different fits; It then optimises the fit based on our in-house developed functions. After fitting, the tipping point was evaluated. The key algorithm functions and required data are included inside.
+
+   The typical runtime for this code will be *<1 minute* on a "normal" computer for bifurcation fitting, and *1-2 minutes* for tipping point evaluation.
+
+3. Tipping point prediction example in folder '_Example Prediction Tipping point_'. 
+
+	The "`Plot_PredExample.m`" shows one complete participant, with one training night and seven testing nights. It shows and plots the prediction of tipping points compared to the post-hoc model results. The key algorithm functions (in-house developed) and required data are included inside.
+
+	The typical runtime for this code will be *1-3 minutes* on a "normal" computer.
+
 
 #### Final Plot codes & All Final Data for plots
 
