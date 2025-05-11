@@ -109,7 +109,29 @@ xx_smooth = S_var_smooth-min(S_var_smooth);
 xx_smooth = xx_smooth';   % Ensure row vector
 tvec_plot = -29.9:overlap_min:10;   % Notice causality here, time 0 preceds the first stage N2
 
-figure
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Visualising
+
+load('Hypnogram_This.mat')
+
+f = figure;
+f.Position(3:4) = [500,500];
+
+tonset = find(tvec_plot==0);
+stageNames = {'Awake', 'N1', 'N2', 'N3'};
+
+ax1=subplot(3,1,1);
+plot(tvec_plot,hyp_this,'LineWidth',2,'Color','k','LineStyle','-')
+ylim([0,3])
+box off
+set(gca,'FontSize', 12)
+set(gca,'TickDir','out')
+set(gca,'ticklength',2*get(gca,'ticklength'))
+set(gca,'lineWidth',2)
+set(gca, 'YTick', 0:3, 'YTickLabel', stageNames);
+line([0,0],ax1.YLim,'LineStyle','--','LineWidth',2,'Color','r');
+
+ax2=subplot(3,1,2:3);
 plot(tvec_plot,xx_smooth,'LineWidth',2)
 box off
 xlabel('Time (min)')

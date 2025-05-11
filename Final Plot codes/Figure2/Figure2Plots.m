@@ -405,7 +405,7 @@ f.Position(3:4) = [500,600];
 tonset = find(tvec==0);
 
 ax1=subplot(3,1,3);
-plot(tvec,hyp_expand,'LineWidth',2)
+plot(tvec,hyp_expand,'LineWidth',2,'Color','k')
 ylim([0,3])
 box off
 set(gca,'FontSize', 16)
