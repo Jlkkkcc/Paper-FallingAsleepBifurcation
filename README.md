@@ -18,15 +18,15 @@ There were two types of analysis during revision. The biggest revision was addin
 
 
 ## Some notices
-The code was written and is working in MATLAB R2023a version and Python 3.8, with the additional functions/packages all working under this environment and tested in the Ubuntu system. If the code does not work or run on your side, check firstly your software versions (including external software not included here); Contact the authors if you have done every essential check. Please also ensure that you have installed all relevant MATLAB internal toolboxes (if any).
+The code was written and is working in MATLAB R2023a version and Python 3.8, with the additional functions/packages all working under this environment and tested in the Ubuntu system. If the code does not work or run on your side, check firstly your software versions (including external software not included in the repository, please download and install them on your side); Contact the authors if you have done every essential check. Please also ensure that you have installed all relevant MATLAB internal toolboxes (if any are missing).
 
-Sometimes the external software has been updated, so necessary changes are necessary to make the code run. We have tried to mark them as far as we knew; however might not be comprehensive. 
+Sometimes the external software has been updated, so necessary changes are necessary to make the code run. We have tried to mark them as far as we knew; however, it might not be comprehensive. 
 
 ### External Packages required
 
 1. **CATCH-22**; Please download and install following their instructions to compile the C codes in MATLAB [here](https://github.com/DynamicsAndNeuralSystems/catch22).
 
-   **Notes:** This package has been updated from the version we used (27 features) to 29 features. Excluding the last two features, or modify the codes if you want to include the last two features. The version used in the manuscript analysis is v0.1.0. Please also note, _this toolbox update might result in quantitative differences in the feature output (compared to the manuscript results)_, but should not affect bifurcation dynamic findings.
+   **Notes:** This package has been updated from the version we used (27 features) to 29 features. Excluding the last two features, or modify the codes if you want to include the last two features. The version used in the manuscript analysis is v0.1.0. Please also note, _this toolbox update would result in quantitative differences in the feature outputs, as well as different sequences of feature outputs (compared to the manuscript results)_, but should not affect bifurcation dynamic findings.
    
    Typical installation time: 1-2 minutes
 2. Python package for Functional principal component analysis (FPCA) [here](https://fda.readthedocs.io/en/latest/).
@@ -50,17 +50,21 @@ Sometimes the external software has been updated, so necessary changes are neces
 
 ## Basic introduction of this repository
 
-Before you start to run analyses or plotting, make sure that you add the entire folder to the path in MATLAB. The repository contains four folders:
+Before you start to run analyses or plotting, _make sure that you add the entire folder to the path in MATLAB_. The repository contains four folders:
 
-1. "*Core Algorithms and Examples*": This folder contains the two core algorithms in this paper: feature and sleep distance evaluation, the bifurcation function fitting, and the prediction of the tipping point. The folder also includes some example data for exploration on your own.
+1. **"*Core Algorithms and Examples*"**: This folder contains the two core algorithms in this paper: feature and sleep distance evaluation, the bifurcation function fitting, and the prediction of the tipping point. The folder also includes some example data for exploration on your own.
 
-2. "*Process Codes (NoData)*": This folder contains the process codes to read, process, and analyse the raw sleep data. The raw sleep data should be obtained as specified previously, no data has been given here.
+2. **"*Process Codes (NoData)*"**: This folder contains the process codes to read, process, and analyse the raw sleep data (_everything from scratch_). However, the raw sleep data (PSG) should be obtained as specified previously; no raw data has been deposited here.
 
-3.  "*Final Plot codes*": This folder includes all the codes for generating the main figures as well as Supplementary figures (excluding demographics) of the manuscript.
+3. **"*Final Plot codes*"**: This folder includes all the codes for generating the main figures as well as Supplementary figures (excluding demographics) of the manuscript.
 
-4. "*All Final Data for plots*": This folder only contains all the data necessary for generating plots (Used for codes in the 'Final plots codes' folder). No raw data has been included. 
+4. **"*All Final Data for plots*"**: This folder only contains all the data necessary for generating plots (Used for codes in the 'Final plots codes' folder). No raw data has been included. 
 
-5. "*Revision analysis (add features)*": This folder contains the new codes for the extraction and patching (to the original data structure) of three new EEG features: Sigma band power, Lempel-Ziv complexity, and the aperiodic (1/f) component.
+5. **"*Revision analysis (add features)*"**: This folder contains the new codes for the extraction and patching (to the original data structure) of three new EEG features: Sigma band power, Lempel-Ziv complexity, and the aperiodic (1/f) component.
+
+#### **Instructions for exploration:**
+If you would like to see how the core algorithms in the paper work, please go to the folder **"*Core Algorithms and Examples*"**. If you would like to run through analysis from scratch (from raw PSG data to the end results), you can go to **"*Process Codes (NoData)*"**. If you would like to see figures replicated, please go to **"*Final Plot codes*"**. The other folders document the data and revision analysis codes. 
+
 
 ## Folder details
 
