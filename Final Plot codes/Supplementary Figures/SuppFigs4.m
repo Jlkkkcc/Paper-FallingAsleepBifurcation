@@ -1,39 +1,8 @@
-%% Supplementary figure plots 2-4
-
-% Author: JL
-
-%% Supplementary Figure 2; 2D view of feature space
+%% Supplementary Figure 4: Confounding test for critical slowing down dynamics
 
 clear all
 clc
-load SuppFig2.mat
-
-figure
-histfit(dist_indiv_bedtime_Onset,20,'kernel')
-box off
-xlabel('Distance')
-ylabel('No. of participants')
-set(gca,'FontSize', 12)
-set(gca,'TickDir','out')
-set(gca,'ticklength',2*get(gca,'ticklength'))
-set(gca,'lineWidth',2)
-xlim([-1,20])
-
-figure
-gscatter(Y2d_tsne(:,1),Y2d_tsne(:,2),idxall,[],[],10)
-box off
-set(gca,'FontSize', 12)
-set(gca,'TickDir','out')
-set(gca,'ticklength',2*get(gca,'ticklength'))
-set(gca,'lineWidth',2)
-xlabel('TSNE-1')
-ylabel('TSNE-2')
-
-%% Supplementary Figure 3: Confounding test for critical slowing down dynamics
-
-clear all
-clc
-load SuppFig3.mat
+load SuppFig4.mat
 
 p_th = 0.025 / length(pvec_slp);         % Bonferroni correction
 % p_th = 0.025;
@@ -147,14 +116,5 @@ for iii = 1:length(pvecnow)
 end
 
 xlabel('Time (min)')
-
-
-
-
-
-
-
-
-
 
 
