@@ -1,23 +1,29 @@
 # Paper-FallingAsleepBifurcation
  The scripts and final data repository for paper: "Falling Asleep displays a predictable bifurcation dynamic".
+ 
+ **Potential competing interests**:
+JL and NG have a patent application filed (Patent Application No. 2509587.8) for the methods and computational framework here.
 
 **Paper DOI**:
 
+## Contents
+
+- [Sleep datasets used](#sleep-datasets-used)
+- [Requirements check](#requirements-check)
+- [Basic introduction of this repository](#basic-introduction-of-this-repository)
+- [Revision Notes May-2025](#revision-notes-may-2025)
+- [Folder details](#folder-details)
+
+
+## Sleep datasets used
 **The raw sleep datasets**:
 
 1. Multi-Ethnic Study of Atherosclerosis (MESA); Open-source dataset that can be obtained from National Sleep Research Resources (NSRR); https://sleepdata.org/datasets/mesa 
 
 2. The cohort 2 dataset was collected by the authors, and it can be made available under sufficient material transfer agreements (MTA). Please contact the authors.
 
-**Potential competing interests**:
-The methodology and algorithm of this manuscript are in the process of being evaluated for a patent. 
 
-## Revision Notes May2025
-
-There were two types of analysis during revision. The biggest revision was adding features, where the added feature codes are inside a specific folder, "Revision analysis (add features)". The other analyses were either revising original results (replacing previous files) or were new results directly added to the analysis folders.
-
-
-## Some notices
+## Requirements check
 The code was written and is working in MATLAB R2023a version and Python 3.8, with the additional functions/packages all working under this environment and tested in the Ubuntu system. If the code does not work or run on your side, check firstly your software versions (including external software not included in the repository, please download and install them on your side); Contact the authors if you have done every essential check. Please also ensure that you have installed all relevant MATLAB internal toolboxes (if any are missing).
 
 Sometimes the external software has been updated, so necessary changes are necessary to make the code run. We have tried to mark them as far as we knew; however, it might not be comprehensive. 
@@ -65,6 +71,9 @@ Before you start to run analyses or plotting, _make sure that you add the entire
 #### **Instructions for exploration:**
 If you would like to see how the core algorithms in the paper work, please go to the folder **"*Core Algorithms and Examples*"**. If you would like to run through analysis from scratch (from raw PSG data to the end results), you can go to **"*Process Codes (NoData)*"**. If you would like to see figures replicated, please go to **"*Final Plot codes*"**. The other folders document the data and revision analysis codes. 
 
+## Revision Notes May-2025
+
+There were two types of analysis during revision. The biggest revision was adding features, where the added feature codes are inside a specific folder, "Revision analysis (add features)". The other analyses were either revising original results (replacing previous files) or were new results directly added to the analysis folders.
 
 ## Folder details
 
