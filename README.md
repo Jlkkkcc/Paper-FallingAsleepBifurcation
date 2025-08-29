@@ -122,7 +122,6 @@ There are a few externally developed packages in MATLAB (which do not require in
 * [ViolinPlot](https://github.com/bastibe/Violinplot-Matlab)
 * [DistinguishableColors](https://www.mathworks.com/matlabcentral/fileexchange/29702-generate-maximally-perceptually-distinct-colors#functions_tab)
 * [For PSG (EDF format) Reading](https://www.edfplus.info/downloads/index.html)
-* Circular statistics toolbox [CircStat](https://uk.mathworks.com/matlabcentral/fileexchange/10676-circular-statistics-toolbox-directional-statistics)
 
 The other subfolders within contain our self-developed in-house algorithms and codes for the relevant analysis required.
 
