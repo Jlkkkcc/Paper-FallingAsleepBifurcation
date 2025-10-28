@@ -5,7 +5,7 @@
 JL and NG have a patent application filed (Patent Application No. 2509587.8) for the methods and computational framework here.
 
 **Citations**:
-Li, J., Ilina, A., Peach, R. et al. Falling asleep follows a predictable bifurcation dynamic. Nat Neurosci (2025). https://doi.org/10.1038/s41593-025-02091-1
+Li, J., Ilina, A., Peach, R. et al. Falling asleep follows a predictable bifurcation dynamic. *Nat Neurosci* (2025). https://doi.org/10.1038/s41593-025-02091-1
 
 ## Contents
 
