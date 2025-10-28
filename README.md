@@ -1,10 +1,11 @@
 # Paper-FallingAsleepBifurcation
- The scripts and final data repository for paper: "Falling Asleep displays a predictable bifurcation dynamic".
+ The scripts and final data repository for paper: "Falling asleep follows a predictable bifurcation dynamic".
  
  **Potential competing interests**:
 JL and NG have a patent application filed (Patent Application No. 2509587.8) for the methods and computational framework here.
 
-**Paper DOI**:
+**Citations**:
+Li, J., Ilina, A., Peach, R. et al. Falling asleep follows a predictable bifurcation dynamic. Nat Neurosci (2025). https://doi.org/10.1038/s41593-025-02091-1
 
 ## Contents
 
@@ -110,7 +111,7 @@ In 'Figure3' Folder:
 
 1. "`FPCA_Features.py`": The FPCA analysis and the plots in one file (Figure 3a and 3d).
 2. "`Plot_IndividualFts.m`": The plots of individual feature time series dynamics (Figure 3b and 3e).
-3. "`SleepDistance\_Features_Plot.m`": The plots where features are plotted against the sleep distance dynamics (Figure 3c and 3f).
+3. "`SleepDistance_Features_Plot.m`": The plots where features are plotted against the sleep distance dynamics (Figure 3c and 3f).
 
 #### Process Codes (From Raw PSG data)
 
