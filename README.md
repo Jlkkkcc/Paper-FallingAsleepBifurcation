@@ -33,7 +33,7 @@ Sometimes the external software has been updated, so necessary changes are neces
 
 1. **CATCH-22**; Please download and install following their instructions to compile the C codes in MATLAB [here](https://github.com/DynamicsAndNeuralSystems/catch22).
 
-   **Notes:** This package has been updated from the version we used (27 features) to 29 features. Excluding the last two features, or modify the codes if you want to include the last two features. The version used in the manuscript analysis is v0.1.0. Please also note, _this toolbox update would result in quantitative differences in the feature outputs, as well as different sequences of feature outputs (compared to the manuscript results)_, but should not affect bifurcation dynamic findings.
+   **Notes:** This package has been updated from the version we used (22 features) to 24 features. Excluding the last two features, or modify the codes if you want to include the last two features. The version used in the manuscript analysis is v0.1.0. Please also note, _this toolbox update would result in quantitative differences in the feature outputs, as well as different sequences of feature outputs (compared to the manuscript results)_, but should not affect bifurcation dynamic findings.
    
    Typical installation time: 1-2 minutes
 2. Python package for Functional principal component analysis (FPCA) [here](https://fda.readthedocs.io/en/latest/).
