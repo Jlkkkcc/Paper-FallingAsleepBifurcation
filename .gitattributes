@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# ignore the MacOS Icon file that breaks everything
+Icon? filter=ignore
